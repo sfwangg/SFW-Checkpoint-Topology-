@@ -1,0 +1,1299 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Check Point 網路拓樸工具</title>
+  <style>
+    :root{--panel:#fff;--ink:#172033;--muted:#687386;--line:#dce2ec;--blue:#2563eb;--green:#0f9f78;--shadow:0 12px 32px #12203d12}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 70% -10%,#dceeff 0,#f5f7fb 34rem);color:var(--ink);font-family:Inter,"Noto Sans TC","Microsoft JhengHei",sans-serif}
+    .shell{max-width:1500px;margin:auto;padding:30px 34px 50px}.eyebrow{color:var(--blue);font-size:12px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}.top{display:flex;justify-content:space-between;gap:25px;align-items:flex-end;margin-bottom:24px}.top h1{margin:6px 0 7px;font-size:32px;letter-spacing:-.03em}.top p{margin:0;color:var(--muted);font-size:14px}.privacy{font-size:12px;color:#3f647d;background:#e9f6ff;border:1px solid #c9e7f7;border-radius:999px;padding:9px 13px;white-space:nowrap}
+    .grid{display:grid;gap:20px;min-width:0}.panel{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}.control{padding:20px}.control h2,.section-head h2{font-size:16px;margin:0 0 5px}.help{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 16px}.drop{border:1.5px dashed #9ab4d8;border-radius:14px;background:#f7faff;padding:19px;text-align:center;cursor:pointer;transition:.2s}.drop:hover,.drop.drag{border-color:var(--blue);background:#eef5ff}.drop strong{display:block;font-size:14px}.drop span{font-size:12px;color:var(--muted);display:block;margin-top:7px}.drop input{display:none}.file-list{margin:15px 0;display:grid;gap:8px}.file{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:11px;padding:9px 10px;font-size:12px}.file .dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex:0 0 auto}.file .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.remove{border:0;background:none;color:#9aa5b6;cursor:pointer;font-size:16px}.actions{display:flex;gap:8px}.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:700;font-size:12px;cursor:pointer}.primary{background:var(--blue);color:#fff;flex:1}.secondary{background:#edf1f7;color:#41506a}.status{min-height:19px;color:var(--muted);font-size:12px;margin-top:12px}.content{display:grid;gap:20px;min-width:0}.section-head{display:flex;justify-content:space-between;align-items:center;padding:18px 20px 0}.section-head .meta{font-size:12px;color:var(--muted)}.canvas-wrap{padding:14px 0 20px;min-width:0}.canvas{width:100%;max-width:100%;height:700px;min-height:700px;border-radius:14px;background:linear-gradient(180deg,#f8fbff,#f8f9fc);border:1px solid #e5eaf2;overflow:auto;position:relative}.canvas svg{display:block;width:100%;min-width:760px;height:520px}.empty{display:grid;place-items:center;height:100%;color:var(--muted);text-align:center}.empty b{display:block;color:var(--ink);margin-bottom:8px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 20px 20px}.stat{padding:14px 15px;border-radius:13px;background:#f7f9fc;border:1px solid #e9edf4}.stat .n{font-size:22px;font-weight:800}.stat .l{font-size:11px;color:var(--muted);margin-top:3px}.details{display:grid;grid-template-columns:1fr 1fr;gap:20px;min-width:0}.table-wrap{padding:14px 20px 20px;overflow:auto;max-height:390px}table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;color:var(--muted);font-weight:700;background:#f7f9fc;position:sticky;top:0}td,th{padding:10px 9px;border-bottom:1px solid #edf0f5;vertical-align:top}.pill{display:inline-block;border-radius:999px;padding:3px 7px;background:#e8f1ff;color:#2457ab;font-size:11px;margin:2px 3px 2px 0}.route{background:#fff4dd;color:#98620a}.legend{display:flex;gap:13px;padding:0 20px 17px;font-size:11px;color:var(--muted);flex-wrap:wrap}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}.toast{position:fixed;right:22px;bottom:22px;background:#172033;color:#fff;padding:11px 14px;border-radius:10px;font-size:12px;display:none}.note{font-size:11px;color:var(--muted);line-height:1.5;padding:0 20px 20px}
+    .tree-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:0 20px 12px}.tree-tools button{border:1px solid var(--line);background:#fff;color:#41506a;border-radius:9px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer}.tree-tools .hint{color:var(--muted);font-size:11px;margin-left:auto}.canvas.has-tree{cursor:grab}.canvas.has-tree.panning{cursor:grabbing;user-select:none}.tree-svg .drag-node{cursor:grab;touch-action:none}.tree-svg .drag-node.dragging{cursor:grabbing}.tree-svg text{pointer-events:none;user-select:none}.tree-svg.has-selection .drag-node:not(.is-related),.tree-svg.has-selection path[data-edge]:not(.is-related),.tree-svg.has-selection>g[aria-hidden="true"]{display:none}.tree-svg.has-selection .drag-node.is-related rect,.tree-svg.has-selection .drag-node.is-related circle{stroke-width:2.2px}.tree-svg.has-selection path[data-edge].is-related{opacity:1;stroke-width:5px;filter:drop-shadow(0 0 4px currentColor)}.tree-svg.has-selection .drag-node.is-selected rect,.tree-svg.has-selection .drag-node.is-selected circle{stroke-width:4px;filter:drop-shadow(0 0 7px #2563eb)}
+    @media(max-width:950px){.shell{padding:22px 16px}.grid{grid-template-columns:1fr}.details{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:repeat(2,1fr)}.tree-tools .hint{width:100%;margin-left:0}.canvas{height:560px;min-height:560px}}
+    /* Top import area and distributed ROOT layout */
+    .shell > .grid{grid-template-columns:minmax(0,1fr)}
+    .control-top{display:grid;grid-template-columns:260px minmax(260px,1fr) minmax(250px,1fr);gap:14px 20px;align-items:start;margin-bottom:20px}
+    .control-top .control-intro{grid-column:1/3;grid-row:2;padding-top:0}.control-top .help{margin:0}.control-top .drop{grid-column:1/3;grid-row:1;margin:0}.control-top .control-side{grid-column:3;grid-row:1;display:grid;gap:9px}.control-top .file-list{margin:0;max-height:132px;overflow:auto}.control-top .status{margin-top:0}.control-top .sms-input{margin-top:10px}.control-top .note{grid-column:1/-1;grid-row:3;padding:0}
+    .route-tooltip{position:fixed;z-index:30;display:none;max-width:430px;max-height:440px;overflow:auto;pointer-events:none;white-space:pre-wrap;background:#172033;color:#fff;border:1px solid #44516a;border-radius:10px;padding:10px 12px;font:12px/1.55 Inter,"Noto Sans TC","Microsoft JhengHei",sans-serif;box-shadow:0 12px 28px #12203d35}
+    .route-filter{display:flex;align-items:end;gap:8px;flex-wrap:wrap;padding:12px 20px 0}.route-filter label{display:grid;gap:4px;font-size:10px;color:var(--muted);font-weight:700}.route-filter select,.route-filter input{height:30px;border:1px solid var(--line);border-radius:8px;padding:0 8px;background:#fff;color:var(--ink);font:12px Inter,"Noto Sans TC","Microsoft JhengHei",sans-serif}.route-filter input{width:160px}.route-filter button{height:30px;border:0;border-radius:8px;padding:0 10px;background:#edf1f7;color:#41506a;font-size:11px;font-weight:700;cursor:pointer}.route-filter .result{font-size:11px;color:var(--muted);padding-bottom:6px}
+    @media(max-width:950px){.control-top{grid-template-columns:1fr}.control-top .control-intro,.control-top .drop,.control-top .control-side,.control-top .sms-input,.control-top .note{grid-column:auto;grid-row:auto}}
+    /* Use the browser width for the topology workspace. */
+    .shell{max-width:none;width:100%;padding-left:22px;padding-right:22px}
+    .tree-tools .topology-filter,.tree-tools .topology-toggle{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:11px;font-weight:700}.tree-tools .topology-filter select{height:30px;max-width:180px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:11px Inter,"Noto Sans TC","Microsoft JhengHei",sans-serif;padding:0 6px}.tree-tools .topology-toggle input{accent-color:var(--blue)}.tree-tools .generated-at{color:var(--muted);font-size:11px;margin-left:auto}.tree-svg.has-host-filter .drag-node.is-filtered-out,.tree-svg.has-host-filter path[data-edge].is-filtered-out,.tree-svg.has-host-filter>g[aria-hidden="true"]{display:none}.tree-svg.hide-related-routes path[data-edge-type="route-related"],.tree-svg.hide-gateway-links path[data-edge-type="gateway-link"]{display:none}.tree-svg .policy-icon{cursor:pointer}.tree-svg .policy-icon circle{filter:drop-shadow(0 1px 2px #47556966)}.tree-svg .policy-icon text{pointer-events:none}.supplement-upload{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px;font-weight:700}.control-intro .supplement-upload{margin-top:12px;flex-wrap:wrap}.supplement-upload input{width:0;height:0;opacity:0;position:absolute}.supplement-upload b{color:#9a3412;font-weight:800;white-space:nowrap}.supplement-upload .btn-file{border:0;border-radius:10px;background:#edf1f7;color:#41506a;padding:10px 13px;cursor:pointer;font-size:12px;font-weight:700}.supplement-upload .file-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;max-width:100%}
+    .tree-svg .ping-icon{cursor:pointer}.tree-svg .ping-icon circle{filter:drop-shadow(0 1px 2px #47556966)}.tree-svg .ping-icon text{pointer-events:none}
+    .footer-credit{text-align:center;color:var(--muted);font-size:12px;padding:0 22px 28px}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="top"><div><div class="eyebrow">Check Point</div><h1>Check Point 網路拓樸工具</h1><p>載入最多七份設定檔，快速還原介面與靜態路由關係。</p></div><div class="privacy">⌁ 全程在瀏覽器本機解析，不上傳設定檔</div></div>
+    <aside class="panel control control-top">
+        <div class="control-intro"><h2>匯入補充設備描述 (非必需)</h2><label class="supplement-upload"><span>補充說明 TXT（IP／主機／備註）</span><span class="btn-file">選取 TXT</span><input id="supplementFile" type="file" accept=".txt,text/plain" /><span class="file-name" id="supplementFileName">尚未選取</span></label></div>
+        <label class="drop" id="drop"><strong>拖曳設定檔到這裡</strong><span>請上傳 "show configuration" 與 "cphaprob -a if" 的 .log 或 .txt 檔案</span><input id="files" type="file" accept=".log,.txt,text/plain" multiple /></label>
+        <div class="control-side"><div class="file-list" id="fileList"><div class="help">尚未載入檔案</div></div>
+        <div class="actions"><button class="btn primary" id="renderBtn">產生拓樸</button><button class="btn secondary" id="clearBtn">清除</button></div><div class="status" id="status"></div></div>
+        <div class="note">拓樸依設備、Interface 分層，並將同一 Interface 下使用相同 Next Hop IP 的路由合併分類。靜態路由的註解會一併顯示；Next Hop 對端及相關路由會以虛線標示。</div>
+    </aside>
+    <div class="grid">
+      <section class="content">
+        <section class="panel"><div class="section-head"><div><h2>圓狀網路拓樸</h2><span class="meta" id="topoMeta">等待載入設定檔</span></div><div class="meta">設備 ROOT → Interface → Next Hop IP</div></div><div id="treeTools" class="tree-tools"></div><div class="canvas-wrap"><div class="canvas" id="canvas"><div class="empty"><div><b>先匯入 1–7 份 Check Point 設定檔</b>系統會自動建立可拖曳的圓狀拓樸</div></div></div></div><div class="legend"><span><i style="background:#2563eb"></i>設備 ROOT</span><span><i style="background:#0f9f78"></i>Interface</span><span><i style="background:#8b5cf6"></i>Next Hop IP／路由分類</span><span><i style="width:18px;height:0;border-top:2px dashed #7c3aed;border-radius:0"></i>Next Hop 對端</span><span><i style="width:18px;height:0;border-top:2px dashed #d946ef;border-radius:0"></i>相關路由</span><span>多台設備的 ROOT 會分散於內環，再各自向外展開；所有節點仍可自由拖曳</span></div><div class="stats"><div class="stat"><div class="n" id="sDevices">0</div><div class="l">設備</div></div><div class="stat"><div class="n" id="sIfaces">0</div><div class="l">介面</div></div><div class="stat"><div class="n" id="sRoutes">0</div><div class="l">靜態路由</div></div></div></section>
+        <div class="details">
+          <section class="panel">
+            <div class="section-head"><div><h2>介面</h2><span class="meta">每台設備的 Layer 3 介面</span></div></div>
+            <div class="route-filter">
+              <label>主機名稱<select id="ifaceHostFilter"><option value="">全部主機</option></select></label>
+              <button type="button" id="clearIfaceFilter">清除</button>
+              <span class="result" id="ifaceFilterResult"></span>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th>主機名稱</th><th>介面</th><th>IP / CIDR</th><th>Cluster IP</th><th>註解</th></tr></thead><tbody id="ifaceBody"><tr><td colspan="5" class="help">尚無資料</td></tr></tbody></table></div>
+          </section>
+          <section class="panel">
+            <div class="section-head"><div><h2>路由</h2><span class="meta">依主機名稱查詢目的端與 next-hop</span></div></div>
+            <div class="route-filter">
+              <label>Route Lookup 主機<select id="lookupHostFilter"><option value="">請選擇主機</option></select></label>
+              <label>目的 IP<input id="lookupDestination" type="search" placeholder="例如 10.63.139.252" /></label>
+              <button type="button" id="runRouteLookup">查詢路由</button>
+              <span class="result" id="routeLookupResult">請選擇主機並輸入目的 IP</span>
+            </div>
+            <div class="route-filter">
+              <label>主機名稱<select id="routeHostFilter"><option value="">全部主機</option></select></label>
+              <label>目的端<input id="routeDestinationFilter" type="search" placeholder="輸入目的網段或 IP" /></label>
+              <label>介面<select id="routeInterfaceFilter"><option value="">全部介面</option></select></label>
+              <label>Next-hop<select id="routeNextHopFilter"><option value="">全部 Next-hop</option></select></label>
+              <button type="button" id="clearRouteFilter">清除</button>
+              <span class="result" id="routeFilterResult"></span>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th>主機名稱</th><th>目的地</th><th>Next-hop</th><th>介面</th><th>註解</th></tr></thead><tbody id="routeBody"><tr><td colspan="5" class="help">尚無資料</td></tr></tbody></table></div>
+          </section>
+        </div>
+      </section>
+    </div>
+  </main><footer class="footer-credit">Powered by Jeff.wang</footer><div class="toast" id="toast"></div><div class="route-tooltip" id="routeTooltip" role="status"></div>
+  <script>
+    const $=s=>document.querySelector(s), state={files:[], data:[], model:null, supplements:new Map(), supplementFileName:"", supplementErrors:[], smsIp:"", renderVersion:0};
+    $(".eyebrow").textContent = "Check Point 網路拓樸工具";
+    document.querySelector(".legend span:nth-of-type(6)").insertAdjacentHTML("afterend", '<span>相關路由定義：跨設備的 Next Hop 具有相同目的網段，或彼此路由涵蓋對方設備 IP；此為邏輯關聯，非實體連線。</span>');
+    document.querySelector(".legend").insertAdjacentHTML("beforeend", '<span><i style="background:#9a3412"></i>TXT 補充主機名稱</span>');
+    document.querySelector(".legend").insertAdjacentHTML("beforeend", '<span><i style="width:18px;height:0;border-top:2px solid #64748b;border-radius:0"></i>相同補充主機</span>');
+    document.querySelector(".control-intro .supplement-upload").insertAdjacentHTML("afterend", '<label class="sms-input" style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:#687386">SMS 管理 IP<input id="smsIp" type="text" inputmode="decimal" placeholder="例如 10.0.0.10" style="width:154px;height:28px;border:1px solid #dce2ec;border-radius:8px;padding:0 8px;font:12px Inter,\'Noto Sans TC\',\'Microsoft JhengHei\',sans-serif" /><button id="smsIpConfirm" type="button" class="btn secondary" style="height:28px;padding:0 10px">確定</button></label>');
+    const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    function parseIpv4(value){
+      const parts=String(value||'').trim().split('.');
+      if(parts.length!==4||parts.some(part=>!/^\d{1,3}$/.test(part)||Number(part)>255))return null;
+      return parts.map(Number);
+    }
+    function isValidIpv4(value){return Boolean(parseIpv4(value))}
+    function ipNum(ip){const parts=parseIpv4(ip); return parts ? parts.reduce((a,v)=>(a*256)+v,0)>>>0 : null}
+    function parseCidr(value){
+      const match=String(value||'').trim().match(/^(.+?)(?:\/(\d{1,2}))?$/);
+      if(!match||!isValidIpv4(match[1]))return null;
+      const bits=match[2]===undefined?32:Number(match[2]);
+      return Number.isInteger(bits)&&bits>=0&&bits<=32 ? {ip:match[1],bits} : null;
+    }
+    function cidrNet(c){
+      const parsed=parseCidr(c); if(!parsed)return '';
+      const {ip,bits}=parsed, m=bits===0?0:(0xffffffff<<(32-bits))>>>0, value=ipNum(ip)&m;
+      return `${[value>>>24,value>>>16&255,value>>>8&255,value&255].join('.')}/${bits}`;
+    }
+    function clearRenderedTopology(){state.data=[];state.model=null;treeUi.positions.clear();treeUi.graph=null;treeUi.selectedNodeId=null;treeUi.topologyHost="";treeUi.interfaceHost="";treeUi.routeLookup={host:"",destination:""};treeUi.routeFilter={host:"",destination:"",iface:"",nextHop:""};$('#canvas').innerHTML='<div class="empty"><div><b>先匯入 1–7 份 Check Point 設定檔</b>系統會自動依介面與網段整理圖形</div></div>';['sDevices','sIfaces','sRoutes'].forEach(x=>$('#'+x).textContent='0');$('#topoMeta').textContent='等待載入設定檔';$('#ifaceBody').innerHTML='<tr><td colspan="5" class="help">尚無資料</td></tr>';$('#routeBody').innerHTML='<tr><td colspan="5" class="help">尚無資料</td></tr>';$('#ifaceFilterResult').textContent='';$('#routeFilterResult').textContent='';$('#routeLookupResult').textContent='請選擇主機並輸入目的 IP';}
+    function renderFiles(){ $('#fileList').innerHTML=state.files.length?state.files.map((f,i)=>`<div class="file"><span class="dot"></span><span class="name" title="${esc(f.name)}">${esc(f.name)}</span><button class="remove" data-i="${i}" title="移除">×</button></div>`).join(''):'<div class="help">尚未載入檔案</div>'; document.querySelectorAll('.remove').forEach(b=>b.onclick=()=>{state.renderVersion+=1;state.files.splice(+b.dataset.i,1);renderFiles();if(state.files.length)$('#renderBtn').click();else{clearRenderedTopology();$('#status').textContent='尚未載入檔案'}}); $('#status').textContent=state.files.length>7?'最多只能載入 7 份設定檔':'' }
+    async function addFiles(list){for(const f of [...list])if(/\.(log|txt)$/i.test(f.name)&&state.files.length<7&&!state.files.some(x=>x.name===f.name))state.files.push(f);renderFiles();if(state.files.length)$('#renderBtn').click()}
+    async function loadSupplementFile(file) {
+      state.supplements.clear();
+      state.supplementErrors = [];
+      state.supplementFileName = file?.name || "";
+      if (file) {
+        const contents = await file.text();
+        contents.split(/\r?\n/).forEach((line, index) => {
+          if (!line.trim()) return;
+          const fields = line.trim().split(/\t|,|\s{2,}/).map(value => value.trim()).filter(Boolean);
+          const [ip, hostname, ...remarkFields] = fields;
+          const remark = remarkFields.join(" ");
+          const lineNumber = index + 1;
+          if (fields.length < 3) { state.supplementErrors.push(`第 ${lineNumber} 行：需包含 IP、主機名稱、備註三欄`); return; }
+          if (!isValidIpv4(ip)) { state.supplementErrors.push(`第 ${lineNumber} 行：IP「${ip || "空白"}」格式不正確`); return; }
+          if (!hostname) { state.supplementErrors.push(`第 ${lineNumber} 行：缺少主機名稱`); return; }
+          if (!remark) { state.supplementErrors.push(`第 ${lineNumber} 行：缺少備註`); return; }
+          const entries = state.supplements.get(ip) || [];
+          if (!entries.some(entry => entry.hostname === hostname && entry.remark === remark)) entries.push({ hostname, remark });
+          state.supplements.set(ip, entries);
+        });
+      }
+      const errorCount = state.supplementErrors.length;
+      $("#supplementFileName").textContent = state.supplementFileName ? `${state.supplementFileName}（${state.supplements.size} 筆${errorCount ? `／${errorCount} 行錯誤` : ""}）` : "尚未選取";
+      $("#supplementFileName").title = state.supplementErrors.join("\n");
+      if (errorCount) { $("#status").textContent = `TXT 已略過 ${errorCount} 行格式錯誤`; show(`${state.supplementErrors[0]}${errorCount > 1 ? `；另有 ${errorCount - 1} 行` : ""}`); }
+      if (state.model) draw();
+    }
+    $('#files').onchange=e=>addFiles(e.target.files); const drop=$('#drop'); ['dragenter','dragover'].forEach(x=>drop.addEventListener(x,e=>{e.preventDefault();drop.classList.add('drag')})); ['dragleave','drop'].forEach(x=>drop.addEventListener(x,e=>{e.preventDefault();drop.classList.remove('drag')})); drop.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+    $('#smsIpConfirm').addEventListener('click', () => { const value = $('#smsIp').value.trim(); if (value && !isValidIpv4(value)) { show('SMS 管理 IP 格式不正確'); return; } state.smsIp = value; if (state.model) draw(); });
+    $('#clearBtn').addEventListener('click', () => { state.smsIp = ""; $('#smsIp').value = ""; });
+    $('#supplementFile').onchange = event => loadSupplementFile(event.target.files[0]);
+    $('#clearBtn').onclick=()=>{state.renderVersion+=1;state.files=[];state.data=[];state.model=null;state.supplements.clear();state.supplementFileName="";state.supplementErrors=[];$('#files').value="";$('#supplementFile').value="";$('#supplementFileName').textContent="尚未選取";$('#supplementFileName').title="";treeUi.positions.clear();treeUi.graph=null;treeUi.zoom=1;treeUi.selectedNodeId=null;treeUi.topologyHost="";treeUi.interfaceHost="";treeUi.routeLookup={host:"",destination:""};treeUi.routeFilter={host:"",destination:"",iface:"",nextHop:""};renderFiles();$('#canvas').innerHTML='<div class="empty"><div><b>先匯入 1–7 份 Check Point 設定檔</b>系統會自動依介面與網段整理圖形</div></div>';['sDevices','sIfaces','sRoutes'].forEach(x=>$('#'+x).textContent='0');$('#topoMeta').textContent='等待載入設定檔';$('#ifaceBody').innerHTML='<tr><td colspan="5" class="help">尚無資料</td></tr>';$('#routeBody').innerHTML='<tr><td colspan="5" class="help">尚無資料</td></tr>';$('#ifaceFilterResult').textContent='';$('#routeFilterResult').textContent='';$('#routeLookupResult').textContent='請選擇主機並輸入目的 IP';$('#status').textContent=''};
+    $('#renderBtn').onclick=async()=>{if(!state.files.length){show('請先選取設定檔');return} const renderVersion=++state.renderVersion; $('#status').textContent='正在解析…'; const parsedData=[]; try{for(const f of state.files){const contents=await f.text(); if(renderVersion!==state.renderVersion)return; const parsed=parseGaiaConfiguration(contents,f.name); if(!parsed.routes.length&&!parsed.ifaces.length){show(`${f.name} 找不到 Check Point 介面或靜態路由`);continue} parsedData.push(parsed)} if(renderVersion!==state.renderVersion)return; if(!parsedData.length){$('#status').textContent='沒有可解析的設定檔';return} state.data=parsedData;state.model=buildDataModel(parsedData);draw();if(renderVersion===state.renderVersion)$('#status').textContent=`已解析 ${parsedData.length} 份設定檔，拓樸已更新`}catch(err){console.error(err);if(renderVersion===state.renderVersion){$('#status').textContent='設定檔解析失敗，請確認檔案內容';show('解析失敗，請查看狀態提示')}}};
+    function show(msg){const t=$('#toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2600)}
+    async function copyTextToClipboard(value, successMessage, failureMessage){try{if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(value);else{const input=document.createElement('textarea');input.value=value;input.style.position='fixed';input.style.opacity='0';document.body.append(input);input.select();document.execCommand('copy');input.remove()}show(successMessage)}catch{show(failureMessage)}}
+  </script>
+  <script>
+    function parseGaiaConfiguration(contents, name) {
+      const lines = String(contents || "").replace(/\u0008/g, "").split(/\r?\n/);
+      const hostname = lines.map(line => line.match(/^\s*set hostname\s+(.+?)\s*$/i)?.[1]).find(Boolean) || name.replace(/\.(log|txt)$/i, "");
+      const interfaceAddresses = new Map();
+      const interfaceClusterIps = new Map();
+      const interfaceComments = new Map();
+      const bondMembers = new Map();
+      const comments = new Map();
+      const routeRows = [];
+      let hasClusterMode = false;
+      let managementInterface = "";
+      lines.forEach(line => {
+        if (/^\s*set dynamic-balancing config CLUSTER_MODE value 1\s*$/i.test(line)) { hasClusterMode = true; return; }
+        let match = line.match(/^\s*set management interface\s+(\S+)\s*$/i);
+        if (match) { managementInterface = match[1]; return; }
+        match = line.match(/^\s*add bonding group\s+(\d+)\s+interface\s+(\S+)\s*$/i);
+        if (match) {
+          const [, group, member] = match;
+          if (!bondMembers.has(group)) bondMembers.set(group, []);
+          bondMembers.get(group).push(member);
+          return;
+        }
+        match = line.match(/^\s*set interface\s+(\S+)\s+comments?\s+"([^"]*)"\s*$/i);
+        if (match) { interfaceComments.set(match[1], match[2]); return; }
+        match = line.match(/^\s*set interface\s+(\S+)\s+ipv4-address\s+(\d+(?:\.\d+){3})\s+mask-length\s+(\d{1,2})\s*$/i);
+        if (match) {
+          const [, iface, ip, bits] = match;
+          if (isValidIpv4(ip) && Number(bits) <= 32 && !/^lo$/i.test(iface) && !/^127\./.test(ip)) {
+            const entries = interfaceAddresses.get(iface) || [];
+            const cidr = `${ip}/${bits}`;
+            if (!entries.includes(cidr)) entries.push(cidr);
+            interfaceAddresses.set(iface, entries);
+          }
+          return;
+        }
+        match = line.match(/^\s*set interface\s+(\S+)\s+(?:ipv4-)?(?:virtual-ip|vip)\s+(\d+(?:\.\d+){3})(?:\s+mask-length\s+(\d{1,2}))?\s*$/i);
+        if (match) {
+          const [, iface, ip, bits = "32"] = match;
+          if (isValidIpv4(ip) && Number(bits) <= 32) {
+            const entries = interfaceClusterIps.get(iface) || [];
+            const cidr = `${ip}/${bits}`;
+            if (!entries.includes(cidr)) entries.push(cidr);
+            interfaceClusterIps.set(iface, entries);
+          }
+          return;
+        }
+        match = line.match(/^\s*set static-route\s+(\S+)\s+comment\s+"([^"]*)"\s*$/i);
+        if (match) { comments.set(match[1].toLowerCase(), match[2]); return; }
+        match = line.match(/^\s*set static-route\s+(\S+)\s+nexthop\s+gateway\s+address\s+(\d+(?:\.\d+){3})\s+(?:on|off)\s*$/i);
+        if (match) routeRows.push({ destination: match[1], nextHop: match[2] });
+      });
+      const routes = routeRows.map(route => {
+        const destination = route.destination.toLowerCase() === "default" ? "0.0.0.0/0" : route.destination;
+        return { name: hostname, destination, nextHop: route.nextHop, iface: "—", comment: comments.get(route.destination.toLowerCase()) || "" };
+      });
+      const interfaceNames = new Set([...interfaceAddresses.keys(), ...interfaceClusterIps.keys(), ...interfaceComments.keys()]);
+      const ifaces = [...interfaceNames].filter(iface => !/^lo$/i.test(iface)).map(name => {
+        const ips = interfaceAddresses.get(name) || [];
+        const clusterIps = interfaceClusterIps.get(name) || [];
+        const group = name.match(/^bond(\d+)(?:\.\d+)?$/i)?.[1];
+        const comment = interfaceComments.get(name) || "";
+        const heartbeatEvidence = /\b(?:heart[\s-]*beat|hb)\b/i.test(comment) ? "介面註解" : "";
+        return { name, ips, clusterIps, comment, isHeartbeat: Boolean(heartbeatEvidence), heartbeatEvidence, networks: ips.map(cidrNet), members: group ? [...new Set(bondMembers.get(group) || [])] : [] };
+      });
+      const managementIp = managementInterface ? ifaces.find(iface => iface.name === managementInterface)?.ips[0]?.split("/")[0] || "未定義" : "未定義";
+      return { hostname, managementIp, managementInterface, source: name, ifaces, routes, hasClusterMode };
+    }
+
+  </script>
+  <script>
+    function buildDataModel(devices) {
+      const interfaces = [];
+      const routes = [];
+      const devicesByHost = new Map();
+      const interfacesByHost = new Map();
+      const routesByHost = new Map();
+
+      // Only show Cluster IP values explicitly declared in the configuration.
+      devices.forEach(device => device.ifaces.forEach(iface => { iface.clusterIps = iface.clusterIps || []; }));
+
+      devices.forEach(device => {
+        const host = device.hostname;
+        const hostInterfaces = device.ifaces.map(item => ({ ...item, host }));
+        const hostRoutes = device.routes.map(route => ({ ...route, name: host }));
+        devicesByHost.set(host, device);
+        interfacesByHost.set(host, hostInterfaces);
+        routesByHost.set(host, hostRoutes);
+        interfaces.push(...hostInterfaces);
+        routes.push(...hostRoutes);
+      });
+
+      return {
+        devices,
+        interfaces,
+        routes,
+        devicesByHost,
+        interfacesByHost,
+        routesByHost
+      };
+    }
+
+    function hostLabel(host) {
+      const device = state.model?.devicesByHost.get(host);
+      const managementIp = String(device?.managementIp || "").trim();
+      return managementIp && managementIp !== host ? `${host}（${managementIp}）` : host;
+    }
+
+    const treeUi = { positions: new Map(), graph: null, zoom: 1, selectedNodeId: null, topologyHost: "", showRelatedRoutes: true, showGatewayLinks: true, interfaceHost: "", routeLookup: { host: "", destination: "" }, routeFilter: { host: "", destination: "", iface: "", nextHop: "" } };
+
+    function ipv4InCidr(ip, cidr) {
+      const target=parseIpv4(ip), parsed=parseCidr(cidr);
+      if(!target||!parsed||!String(cidr).includes("/"))return false;
+      const mask=parsed.bits===0?0:(0xffffffff<<(32-parsed.bits))>>>0;
+      return (ipNum(ip)&mask)===(ipNum(parsed.ip)&mask);
+    }
+
+    const isIpv4 = isValidIpv4;
+    const interfaceIp = cidr => String(cidr || "").split("/")[0];
+    const isDefaultRoute = route => cidrNet(route.destination) === "0.0.0.0/0";
+
+    function ownerInterface(device, route) {
+      if (route.iface && route.iface !== "—") {
+        const exact = device.ifaces.find(item => item.name === route.iface);
+        if (exact) return exact;
+      }
+      if (isIpv4(route.nextHop)) {
+        const inferred = device.ifaces.find(item => item.ips.some(cidr => ipv4InCidr(route.nextHop, cidr)));
+        if (inferred) return inferred;
+      }
+      return null;
+    }
+
+    function networkBounds(value) {
+      const normalized = String(value || "").trim();
+      const [rawIp, rawBits = "32"] = normalized.split("/");
+      if (!isIpv4(rawIp)) return null;
+      const bits = Number(rawBits);
+      if (!Number.isInteger(bits) || bits < 0 || bits > 32) return null;
+      const mask = bits === 0 ? 0 : (0xffffffff << (32 - bits)) >>> 0;
+      const start = (ipNum(rawIp) & mask) >>> 0;
+      return { start, end: (start | (~mask >>> 0)) >>> 0 };
+    }
+
+    function networksOverlap(left, right) {
+      const a = networkBounds(left);
+      const b = networkBounds(right);
+      return Boolean(a && b && a.start <= b.end && b.start <= a.end);
+    }
+
+    function routeCoversDevice(route, device) {
+      if (!route.destination?.includes("/") || isDefaultRoute(route)) return false;
+      return device.ifaces.some(item => item.ips.some(cidr => ipv4InCidr(interfaceIp(cidr), route.destination)));
+    }
+
+    function isSameHaCluster(left, right) {
+      return Boolean(left?.hasClusterMode && right?.hasClusterMode)
+        && isIpv4(left?.managementIp) && isIpv4(right?.managementIp)
+        && cidrNet(`${left.managementIp}/24`) === cidrNet(`${right.managementIp}/24`)
+        && Math.abs(ipNum(left.managementIp) - ipNum(right.managementIp)) === 1;
+    }
+
+    function makeTopologyDevices(devices) {
+      const used = new Set();
+      const topologyDevices = [];
+      devices.forEach((device, index) => {
+        if (used.has(index)) return;
+        const partnerIndex = devices.findIndex((candidate, candidateIndex) => candidateIndex > index && !used.has(candidateIndex) && isSameHaCluster(device, candidate));
+        if (partnerIndex < 0) { topologyDevices.push(device); return; }
+        const members = [device, devices[partnerIndex]].sort((left, right) => ipNum(left.managementIp) - ipNum(right.managementIp));
+        used.add(index); used.add(partnerIndex);
+        const ifaceMap = new Map();
+        members.forEach(member => member.ifaces.forEach(iface => {
+          if (!ifaceMap.has(iface.name)) ifaceMap.set(iface.name, { ...iface, ips: [], ipOwners: [], clusterIps: [], members: [...(iface.members || [])], comments: [] });
+          const merged = ifaceMap.get(iface.name);
+          iface.ips.forEach(ip => {
+            if (!merged.ips.includes(ip)) merged.ips.push(ip);
+            if (!merged.ipOwners.some(item => item.hostname === member.hostname && item.ip === ip)) merged.ipOwners.push({ hostname: member.hostname, ip, comment: iface.comment || "" });
+          });
+          (iface.clusterIps || []).forEach(ip => { if (!merged.clusterIps.includes(ip)) merged.clusterIps.push(ip); });
+          if (iface.comment && !merged.comments.includes(iface.comment)) merged.comments.push(iface.comment);
+          merged.isHeartbeat ||= Boolean(iface.isHeartbeat);
+          merged.heartbeatEvidence ||= iface.heartbeatEvidence || "";
+        }));
+        const ifaces = [...ifaceMap.values()].map(iface => {
+          const comment = iface.comments.join(" / ");
+          const isClusterInterface = iface.ips.length >= 2 && !iface.isHeartbeat;
+          const parsedIps = iface.ips.map(parseCidr).filter(Boolean);
+          if (isClusterInterface && parsedIps.length >= 2 && parsedIps.every(item => item.bits === parsedIps[0].bits && cidrNet(`${item.ip}/${item.bits}`) === cidrNet(`${parsedIps[0].ip}/${parsedIps[0].bits}`)) && Math.abs(ipNum(parsedIps[0].ip) - ipNum(parsedIps[1].ip)) === 1) {
+            const clusterValue = Math.min(ipNum(parsedIps[0].ip), ipNum(parsedIps[1].ip)) - 1;
+            const inferredClusterIp = `${[clusterValue >>> 24, clusterValue >>> 16 & 255, clusterValue >>> 8 & 255, clusterValue & 255].join(".")}/${parsedIps[0].bits}`;
+            if (!iface.clusterIps.includes(inferredClusterIp)) iface.clusterIps.push(inferredClusterIp);
+          }
+          return { ...iface, comment, isClusterInterface, networks: iface.ips.map(cidrNet) };
+        });
+        const routeMap = new Map();
+        members.forEach(member => member.routes.forEach(route => {
+          const key = `${route.destination}|${route.nextHop}|${route.iface}|${route.comment || ""}`;
+          if (!routeMap.has(key)) routeMap.set(key, { ...route, sourceHosts: [member.hostname] });
+          else if (!routeMap.get(key).sourceHosts.includes(member.hostname)) routeMap.get(key).sourceHosts.push(member.hostname);
+        }));
+        const hostname = `Cluster: ${members.map(member => member.hostname).join(" + ")}`;
+        topologyDevices.push({ hostname, managementIp: members.map(member => member.managementIp).join(" / "), source: members.map(member => member.source).join(", "), ifaces, routes: [...routeMap.values()].map(route => ({ ...route, name: hostname })), clusterMembers: members.map(member => ({ hostname: member.hostname, managementIp: member.managementIp })) });
+      });
+      return topologyDevices;
+    }
+
+    function makeTreeGraph() {
+      const nodes = [], edges = [];
+      const interfaceRefs = [], nextHopRefs = [];
+      const deviceLayouts = makeTopologyDevices(state.data).map((device, deviceIndex) => {
+        const interfaceGroups = new Map(device.ifaces.map(iface => [iface.name, { iface, routes: [] }]));
+        device.routes.forEach(route => {
+          const owner = ownerInterface(device, route);
+          const key = owner?.name || "__unassigned__";
+          if (!interfaceGroups.has(key)) interfaceGroups.set(key, { iface: owner, routes: [] });
+          interfaceGroups.get(key).routes.push(route);
+        });
+        const branches = [...interfaceGroups.values()].filter(group => group.iface || group.routes.length).sort((left, right) => (left.iface?.name || "~未指定介面").localeCompare(right.iface?.name || "~未指定介面", "en", { numeric: true })).map((group, branchIndex) => {
+          const nextHopMap = new Map();
+          group.routes.forEach(route => {
+            const key = route.nextHop || "—";
+            if (!nextHopMap.has(key)) nextHopMap.set(key, { nextHop: key, routes: [] });
+            nextHopMap.get(key).routes.push(route);
+          });
+          return { ...group, branchIndex, nextHops: [...nextHopMap.values()] };
+        });
+        return { device, deviceIndex, branches };
+      });
+
+      const deviceCount = Math.max(1, deviceLayouts.length);
+      const areCloseManagementIps = (left, right) => isIpv4(left) && isIpv4(right) && cidrNet(`${left}/24`) === cidrNet(`${right}/24`) && Math.abs(ipNum(left) - ipNum(right)) <= 4;
+      const useHorizontalPairLayout = deviceCount === 2 && areCloseManagementIps(deviceLayouts[0].device.managementIp, deviceLayouts[1].device.managementIp);
+      const nextHopCount = deviceLayouts.reduce((sum, layout) => sum + layout.branches.reduce((branchSum, branch) => branchSum + branch.nextHops.length, 0), 0);
+      const densestDeviceNextHops = Math.max(0, ...deviceLayouts.map(layout => layout.branches.reduce((sum, branch) => sum + branch.nextHops.length, 0)));
+      // Make every device a self-contained radial topology: ROOT at the local
+      // centre, with Interface and Next Hop rings around it.
+      const rootSize = 128;
+      const interfaceWidth = 192, interfaceHeight = 42;
+      const interfaceRadius = 185;
+      const nextHopRadius = nextHopCount ? Math.max(420, Math.min(650, densestDeviceNextHops * 45)) : 0;
+      const outerRadius = nextHopRadius || interfaceRadius + 150;
+      const columns = deviceCount === 1 ? 1 : Math.ceil(Math.sqrt(deviceCount));
+      const rows = Math.ceil(deviceCount / columns);
+      const clusterGap = 8;
+      const clusterStep = outerRadius * (useHorizontalPairLayout ? 2.25 : 1.6) + clusterGap;
+      const padding = outerRadius + 39;
+      const layoutWidth = (columns - 1) * clusterStep + padding * 2;
+      const layoutHeight = (rows - 1) * clusterStep + padding * 2;
+      const width = Math.max(1320, Math.ceil(layoutWidth));
+      const height = Math.max(1020, Math.ceil(layoutHeight));
+      const layoutOffsetX = (width - layoutWidth) / 2;
+      const layoutOffsetY = (height - layoutHeight) / 2;
+      const clusterCenters = deviceLayouts.map((layout, index) => ({
+        x: layoutOffsetX + padding + (index % columns) * clusterStep,
+        y: layoutOffsetY + padding + Math.floor(index / columns) * clusterStep
+      }));
+      // Gateways in the same management /24 with nearby host addresses are
+      // normally an HA pair. Place them left/right, point branches inward,
+      // and mirror the same sorted interface order across the centre line.
+      const mirrorSides = new Map();
+      for (let leftIndex = 0; leftIndex < deviceLayouts.length; leftIndex += 1) {
+        if (!useHorizontalPairLayout) break;
+        for (let rightIndex = leftIndex + 1; rightIndex < deviceLayouts.length; rightIndex += 1) {
+          if (mirrorSides.has(leftIndex) || mirrorSides.has(rightIndex)) continue;
+          const leftIp = deviceLayouts[leftIndex].device.managementIp;
+          const rightIp = deviceLayouts[rightIndex].device.managementIp;
+          if (!isIpv4(leftIp) || !isIpv4(rightIp) || cidrNet(`${leftIp}/24`) !== cidrNet(`${rightIp}/24`) || Math.abs(ipNum(leftIp) - ipNum(rightIp)) > 4) continue;
+          const lowerIndex = ipNum(leftIp) < ipNum(rightIp) ? leftIndex : rightIndex;
+          const higherIndex = lowerIndex === leftIndex ? rightIndex : leftIndex;
+          const xLeft = Math.min(clusterCenters[leftIndex].x, clusterCenters[rightIndex].x);
+          const xRight = Math.max(clusterCenters[leftIndex].x, clusterCenters[rightIndex].x);
+          const y = (clusterCenters[leftIndex].y + clusterCenters[rightIndex].y) / 2;
+          clusterCenters[lowerIndex] = { x: xLeft, y };
+          clusterCenters[higherIndex] = { x: xRight, y };
+          mirrorSides.set(lowerIndex, "left");
+          mirrorSides.set(higherIndex, "right");
+        }
+      }
+      const atRing = (localCenter, radius, angle, w, h) => ({ x: localCenter.x + Math.cos(angle) * radius - w / 2, y: localCenter.y + Math.sin(angle) * radius - h / 2 });
+      const addNode = node => {
+        const saved = treeUi.positions.get(node.id);
+        if (saved) { node.x = saved.x; node.y = saved.y; }
+        nodes.push(node);
+        return node;
+      };
+
+      deviceLayouts.forEach(layout => {
+        const { device, deviceIndex, branches } = layout;
+        const localCenter = clusterCenters[deviceIndex];
+        const rootNodeSize = device.clusterMembers?.length ? 104 : rootSize;
+        const rootPosition = atRing(localCenter, 0, 0, rootNodeSize, rootNodeSize);
+        const root = addNode({ id: `root:${deviceIndex}`, type: "root", ...rootPosition, w: rootNodeSize, h: rootNodeSize, device, label: device.hostname });
+        const mirrorSide = mirrorSides.get(deviceIndex);
+        const usableSector = mirrorSide ? Math.PI * .9 : Math.PI * 2 * .92;
+        const branchWeights = branches.map(branch => mirrorSide ? 1 : Math.max(1, branch.nextHops.length));
+        const totalBranchWeight = Math.max(1, branchWeights.reduce((sum, weight) => sum + weight, 0));
+        const branchDirection = mirrorSide === "right" ? -1 : 1;
+        let branchCursor = mirrorSide === "left" ? -usableSector / 2 : mirrorSide === "right" ? Math.PI + usableSector / 2 : -Math.PI / 2 - usableSector / 2;
+        const branchLayouts = branches.map((branch, branchIndex) => {
+          const branchSlot = usableSector * branchWeights[branchIndex] / totalBranchWeight;
+          const branchAngle = branchCursor + branchDirection * branchSlot / 2;
+          branchCursor += branchDirection * branchSlot;
+          return { branch, branchIndex, branchSlot, branchAngle };
+        });
+        const bondGroups = new Map();
+        branchLayouts.forEach(({ branch, branchIndex, branchAngle }) => {
+          const vlanMatch = branch.iface?.name?.match(/^bond(\d+)\.(\d+)$/i);
+          if (!vlanMatch) return;
+          const bondNumber = vlanMatch[1];
+          const group = bondGroups.get(bondNumber) || { x: 0, y: 0, count: 0, members: branch.iface?.members || [], branchIndexes: [] };
+          group.x += Math.cos(branchAngle);
+          group.y += Math.sin(branchAngle);
+          group.count += 1;
+          group.branchIndexes.push(branchIndex);
+          if (!group.members.length && branch.iface?.members?.length) group.members = branch.iface.members;
+          bondGroups.set(bondNumber, group);
+        });
+        const bondParentNodes = new Map();
+
+        branchLayouts.forEach(({ branch, branchIndex, branchSlot, branchAngle }) => {
+            const ownerLineCount = Math.max(1, branch.iface?.ipOwners?.length || branch.iface?.ips?.length || 0);
+            const hasSeparateComment = Boolean(branch.iface?.comment && (branch.iface?.isClusterInterface || !branch.iface?.ipOwners?.length));
+            const interfaceNodeHeight = interfaceHeight
+              + (branch.iface?.isClusterInterface ? 14 : Math.max(0, ownerLineCount - 1) * 14)
+              + (branch.iface?.clusterIps?.length ? 16 : 0)
+              + (hasSeparateComment ? 14 : 0);
+            const interfaceNodeWidth = branch.iface?.isClusterInterface ? Math.round(interfaceWidth * .7) : interfaceWidth;
+            const interfacePosition = atRing(localCenter, interfaceRadius, branchAngle, interfaceNodeWidth, interfaceNodeHeight);
+            const interfaceNode = addNode({
+              id: `interface:${deviceIndex}:${branch.branchIndex}`, type: "interface", ...interfacePosition, w: interfaceNodeWidth, h: interfaceNodeHeight,
+              label: branch.iface?.name || "未指定介面", displayLabel: branch.iface?.members?.length ? `${branch.iface.name.replace(/^bond/i, "Bond")} (${branch.iface.members.join(" + ")})` : (branch.iface?.name || "未指定介面"), ips: branch.iface?.ips || [], ipOwners: branch.iface?.ipOwners || [], clusterIps: branch.iface?.clusterIps || [], comment: branch.iface?.comment || "", isHeartbeat: Boolean(branch.iface?.isHeartbeat), heartbeatEvidence: branch.iface?.heartbeatEvidence || "", isClusterInterface: Boolean(branch.iface?.isClusterInterface), members: branch.iface?.members || [], routeCount: branch.routes.length,
+              deviceIndex, device
+            });
+            if (/^(?:eth|mgmt$)/i.test(branch.iface?.name || "")) interfaceNode.displayLabel = `介面 · ${branch.iface.name}`;
+            const vlanMatch = branch.iface?.name?.match(/^bond(\d+)\.(\d+)$/i);
+            let bondParentNode = null;
+            if (vlanMatch) {
+              const [, bondNumber, vlanTag] = vlanMatch;
+              const parentKey = `bond-parent:${deviceIndex}:${bondNumber}`;
+              bondParentNode = bondParentNodes.get(parentKey);
+              if (!bondParentNode) {
+                const bondGroup = bondGroups.get(bondNumber);
+                const bondMembers = bondGroup?.members || branch.iface?.members || [];
+                const bondAngle = bondGroup ? Math.atan2(bondGroup.y, bondGroup.x) : branchAngle;
+                const parentPosition = atRing(localCenter, Math.max(rootNodeSize / 2 + 76, interfaceRadius * .52), bondAngle, 165, 50);
+                bondParentNode = addNode({
+                  id: parentKey, type: "interface", ...parentPosition, w: 165, h: 50,
+                  label: `bond${bondNumber}`, displayLabel: `Bond${bondNumber}${bondMembers.length ? ` (${bondMembers.join(" + ")})` : ""}`,
+                  ips: [], ipOwners: [], clusterIps: [], comment: "", isBondParent: true, deviceIndex, device
+                });
+                bondParentNodes.set(parentKey, bondParentNode);
+                edges.push({ from: root.id, to: bondParentNode.id, type: "root", title: `${device.hostname} → ${bondParentNode.label}` });
+              }
+              const bondGroup = bondGroups.get(bondNumber);
+              const vlanIndex = bondGroup?.branchIndexes.indexOf(branchIndex) ?? 0;
+              const vlanCount = bondGroup?.count || 1;
+              const parentCenter = { x: bondParentNode.x + bondParentNode.w / 2, y: bondParentNode.y + bondParentNode.h / 2 };
+              const vlanAngle = vlanCount === 1 ? branchAngle : branchAngle - Math.PI / 2 + Math.PI * 2 * vlanIndex / vlanCount;
+              const vlanRadius = Math.max(150, Math.min(260, 120 + vlanCount * 22));
+              if (!treeUi.positions.has(interfaceNode.id)) {
+                const vlanPosition = atRing(parentCenter, vlanRadius, vlanAngle, interfaceNode.w, interfaceNode.h);
+                interfaceNode.x = vlanPosition.x;
+                interfaceNode.y = vlanPosition.y;
+              }
+              interfaceNode.displayLabel = `Bond${bondNumber}.${vlanTag}`;
+              interfaceNode.isVlan = true;
+            }
+            interfaceRefs.push({ node: interfaceNode, iface: branch.iface, device, deviceIndex });
+            const edgeOrigin = bondParentNode || root;
+            edges.push({ from: edgeOrigin.id, to: interfaceNode.id, type: "root", title: `${edgeOrigin.label} → ${interfaceNode.label}` });
+
+            branch.nextHops.forEach((nextHopGroup, nextHopIndex) => {
+              const count = branch.nextHops.length;
+              const fanWidth = Math.max(.08, branchSlot * .84);
+              const nextHopAngle = count === 1 ? branchAngle : branchAngle - fanWidth / 2 + fanWidth * nextHopIndex / (count - 1);
+              const hasSupplement = state.supplements.has(nextHopGroup.nextHop);
+              const nextHopWidth = hasSupplement ? 184 : 168;
+              const nextHopHeight = hasSupplement ? 66 : 58;
+              const nextHopPosition = atRing(localCenter, nextHopRadius, nextHopAngle, nextHopWidth, nextHopHeight);
+              const nextHopNode = addNode({
+                id: `next-hop:${deviceIndex}:${branch.branchIndex}:${nextHopIndex}`, type: "next-hop", ...nextHopPosition, w: nextHopWidth, h: nextHopHeight,
+                label: nextHopGroup.nextHop, routes: nextHopGroup.routes, targets: [], device, deviceIndex
+              });
+              edges.push({ from: interfaceNode.id, to: nextHopNode.id, type: "next-hop", title: `${interfaceNode.label} → Next Hop ${nextHopGroup.nextHop}` });
+              nextHopRefs.push({ node: nextHopNode, routes: nextHopGroup.routes, device, deviceIndex });
+            });
+        });
+      });
+
+      const smsIp = state.smsIp;
+      if (isIpv4(smsIp)) {
+        const smsConnections = [];
+        deviceLayouts.forEach(({ device, deviceIndex }) => {
+          const matchingRoute = device.routes
+            .filter(route => ipv4InCidr(smsIp, route.destination))
+            .sort((left, right) => (parseCidr(right.destination)?.bits || 0) - (parseCidr(left.destination)?.bits || 0))[0];
+          if (!matchingRoute?.nextHop) return;
+          const nextHopRef = nextHopRefs.find(ref => ref.deviceIndex === deviceIndex && ref.node.label === matchingRoute.nextHop && ref.routes.some(route => route.destination === matchingRoute.destination));
+          if (nextHopRef) smsConnections.push({ device, route: matchingRoute, nextHopRef });
+        });
+        if (smsConnections.length) {
+          const smsNode = addNode({ id: `sms:${smsIp}`, type: "sms", x: width - 184, y: Math.max(24, height / 2 - 38), w: 160, h: 76, label: smsIp });
+          smsConnections.forEach(({ device, route, nextHopRef }) => {
+            edges.push({ from: nextHopRef.node.id, to: smsNode.id, type: "sms-route", title: `${device.hostname}：${route.destination} → SMS ${smsIp}` });
+          });
+        }
+      }
+
+      nextHopRefs.forEach(ref => {
+        if (!isIpv4(ref.node.label)) return;
+        const candidates = interfaceRefs.filter(target => target.deviceIndex !== ref.deviceIndex && target.iface);
+        const exact = candidates.filter(target => target.iface.ips.some(cidr => interfaceIp(cidr) === ref.node.label));
+        const sameSubnet = exact.length ? [] : candidates.filter(target => target.iface.ips.some(cidr => ipv4InCidr(ref.node.label, cidr)));
+        [...exact, ...sameSubnet].slice(0, 3).forEach(target => {
+          const targetText = `${target.device.hostname} / ${target.iface.name}`;
+          ref.node.targets.push(targetText);
+          edges.push({ from: ref.node.id, to: target.node.id, type: "gateway-link", relation: true, title: `Next Hop 對應 ${targetText}` });
+        });
+      });
+
+      const supplementClusters = new Map();
+      nextHopRefs.forEach(ref => {
+        const entry = state.supplements.get(ref.node.label)?.[0];
+        if (!entry?.hostname) return;
+        if (!supplementClusters.has(entry.hostname)) supplementClusters.set(entry.hostname, { hostname: entry.hostname, remarks: new Set(), refs: [] });
+        const cluster = supplementClusters.get(entry.hostname);
+        if (entry.remark) cluster.remarks.add(entry.remark);
+        cluster.refs.push(ref);
+      });
+      supplementClusters.forEach(({ hostname, remarks, refs }) => {
+        if (refs.length < 2) return;
+        const originalCenterX = refs.reduce((sum, ref) => sum + ref.node.x + ref.node.w / 2, 0) / refs.length;
+        const originalCenterY = refs.reduce((sum, ref) => sum + ref.node.y + ref.node.h / 2, 0) / refs.length;
+        const maxNodeWidth = Math.max(...refs.map(ref => ref.node.w));
+        const maxNodeHeight = Math.max(...refs.map(ref => ref.node.h));
+        const rootSize = 96;
+        const interfaceRadius = Math.max(112, Math.min(170, 92 + refs.length * 9));
+        const requiredRadius = interfaceRadius + Math.max(maxNodeWidth, maxNodeHeight) / 2;
+        const clusterNodes = new Set(refs.map(ref => ref.node));
+        const occupiedNodes = nodes.filter(node => !clusterNodes.has(node));
+        const candidates = [{ x: originalCenterX, y: originalCenterY }];
+        for (let x = requiredRadius; x < width - requiredRadius; x += 100) for (let y = requiredRadius; y < height - requiredRadius; y += 100) candidates.push({ x, y });
+        const selectedCenter = candidates.filter(candidate => candidate.x - requiredRadius >= 0 && candidate.x + requiredRadius <= width && candidate.y - requiredRadius >= 0 && candidate.y + requiredRadius <= height).reduce((best, candidate) => {
+          const nearest = occupiedNodes.length ? Math.min(...occupiedNodes.map(node => Math.hypot(candidate.x - (node.x + node.w / 2), candidate.y - (node.y + node.h / 2)))) : 999;
+          const score = nearest - Math.hypot(candidate.x - originalCenterX, candidate.y - originalCenterY) * .18;
+          return !best || score > best.score ? { ...candidate, score } : best;
+        }, null) || { x: originalCenterX, y: originalCenterY };
+        const supplementRoot = addNode({
+          id: `supplement-root:${hostname}`,
+          type: "supplement-root",
+          x: selectedCenter.x - rootSize / 2,
+          y: selectedCenter.y - rootSize / 2,
+          w: rootSize,
+          h: rootSize,
+          label: hostname,
+          remark: [...remarks].join(" / "),
+          device: refs[0].device
+        });
+        refs.forEach((ref, index) => {
+          ref.node.supplementHost = hostname;
+          if (!treeUi.positions.has(ref.node.id)) {
+            const angle = -Math.PI / 2 + Math.PI * 2 * index / refs.length;
+            ref.node.x = Math.max(0, Math.min(width - ref.node.w, selectedCenter.x + Math.cos(angle) * interfaceRadius - ref.node.w / 2));
+            ref.node.y = Math.max(0, Math.min(height - ref.node.h, selectedCenter.y + Math.sin(angle) * interfaceRadius - ref.node.h / 2));
+          }
+          edges.push({ from: supplementRoot.id, to: ref.node.id, type: "supplement-link", title: `補充主機 ${hostname} → Interface ${ref.node.label}` });
+        });
+      });
+
+      const relatedPairs = new Set();
+      for (let a = 0; a < nextHopRefs.length; a += 1) {
+        for (let b = a + 1; b < nextHopRefs.length; b += 1) {
+          const left = nextHopRefs[a], right = nextHopRefs[b];
+          if (left.deviceIndex === right.deviceIndex) continue;
+          const leftDestinations = new Set(left.routes.map(route => cidrNet(route.destination)).filter(destination => destination && destination !== "0.0.0.0/0"));
+          const sameDestination = right.routes.map(route => cidrNet(route.destination)).find(destination => leftDestinations.has(destination));
+          let relation = sameDestination ? `相同目的網段 ${sameDestination}` : "";
+          if (!relation) {
+            const leftToRight = left.routes.some(route => routeCoversDevice(route, right.device));
+            const rightToLeft = right.routes.some(route => routeCoversDevice(route, left.device));
+            if (leftToRight && rightToLeft) relation = "對向路由";
+          }
+          if (!relation) continue;
+          const pairKey = [left.node.id, right.node.id].sort().join("|");
+          if (relatedPairs.has(pairKey)) continue;
+          relatedPairs.add(pairKey);
+          edges.push({ from: left.node.id, to: right.node.id, type: "route-related", relation: true, title: relation });
+        }
+      }
+
+      return {
+        nodes, edges, width, height, fit: deviceCount === 1 && nextHopCount <= 12,
+        ringGuides: clusterCenters.flatMap(localCenter => [interfaceRadius, nextHopRadius].filter(Boolean).map((radius, index) => ({ ...localCenter, radius, index }))),
+        nodeMap: new Map(nodes.map(node => [node.id, node])),
+        relationCount: edges.filter(edge => edge.relation).length,
+        nextHopCount,
+        rootCount: deviceLayouts.length,
+        mirroredPairCount: mirrorSides.size / 2
+      };
+    }
+
+    function edgePath(from, to, edge) {
+      if (edge?.relation) {
+        const x1 = from.x + from.w / 2, y1 = from.y + from.h / 2;
+        const x2 = to.x + to.w / 2, y2 = to.y + to.h / 2;
+        if (Math.abs(x2 - x1) < 90) {
+          const sideX = Math.max(x1, x2) + 90;
+          return `M${x1},${y1} C${sideX},${y1} ${sideX},${y2} ${x2},${y2}`;
+        }
+        const midX = (x1 + x2) / 2;
+        return `M${x1},${y1} C${midX},${y1} ${midX},${y2} ${x2},${y2}`;
+      }
+      const x1 = from.x + from.w / 2, y1 = from.y + from.h / 2;
+      const x2 = to.x + to.w / 2, y2 = to.y + to.h / 2;
+      return `M${x1},${y1} L${x2},${y2}`;
+    }
+
+    function nodeMarkup(node) {
+      if (node.type === "sms") {
+        return `<g class="drag-node" data-node="${esc(node.id)}" transform="translate(${node.x},${node.y})"><title>SMS 管理 IP：${esc(node.label)}</title><rect width="${node.w}" height="${node.h}" rx="12" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8" filter="url(#treeShadow)"/><text x="${node.w / 2}" y="28" text-anchor="middle" font-size="11" font-weight="800" fill="#9a3412">SMS</text><text x="${node.w / 2}" y="51" text-anchor="middle" font-size="10" font-weight="800" fill="#c2410c">${esc(node.label)}</text></g>`;
+      }
+      if (node.type === "supplement-root") {
+        const remark = String(node.remark || "TXT HOST");
+        const remarkDisplay = remark.length > 18 ? `${remark.slice(0, 17)}…` : remark;
+        return `<g class="drag-node" data-node="${esc(node.id)}" transform="translate(${node.x},${node.y})"><title>${esc(remark)}</title><circle cx="48" cy="48" r="45" fill="#ffffff" stroke="#9a3412" stroke-width="2.4" filter="url(#treeShadow)"/><circle cx="48" cy="48" r="38" fill="#fff1e5" stroke="#fdba74"/><text x="48" y="34" text-anchor="middle" font-size="8.4" font-weight="800" fill="#9a3412">ROOT</text><text x="48" y="54" text-anchor="middle" font-size="9.6" font-weight="800" fill="#7c2d12">${esc(node.label).slice(0, 12)}</text><text x="48" y="69" text-anchor="middle" font-size="6.24" fill="#9a3412">${esc(remarkDisplay)}</text></g>`;
+      }
+      if (node.type === "root") {
+        const deviceIp = node.device.managementIp || "未定義";
+        if (node.device.clusterMembers?.length) {
+          const memberLines = node.device.clusterMembers.map(member => `${member.hostname}（${member.managementIp}）`);
+          return `<g class="drag-node" data-node="${esc(node.id)}" transform="translate(${node.x},${node.y})"><title>${esc(`Cluster 成員：\n${memberLines.join("\n")}`)}</title><circle cx="52" cy="52" r="50" fill="#ffffff" stroke="#2563eb" stroke-width="2" filter="url(#treeShadow)"/><circle cx="52" cy="52" r="43" fill="#eff5ff" stroke="#bdd3f7"/><text x="52" y="30" text-anchor="middle" font-size="8.6" font-weight="800" fill="#2563eb">CLUSTER ROOT</text><text x="52" y="54" text-anchor="middle" font-size="5.2" font-weight="800" fill="#172033">${esc(memberLines[0] || "")}</text><text x="52" y="69" text-anchor="middle" font-size="5.2" font-weight="800" fill="#172033">${esc(memberLines[1] || "")}</text></g>`;
+        }
+        return `<g class="drag-node" data-node="${esc(node.id)}" transform="translate(${node.x},${node.y})"><circle cx="64" cy="64" r="60" fill="#ffffff" stroke="#2563eb" stroke-width="2" filter="url(#treeShadow)"/><circle cx="64" cy="64" r="53" fill="#eff5ff" stroke="#bdd3f7"/><text x="64" y="34" text-anchor="middle" font-size="9" font-weight="700" fill="#2563eb">ROOT</text><text x="64" y="62" text-anchor="middle" font-size="7.92" fill="#172033">主機名稱：<tspan font-weight="800">${esc(node.label).slice(0, 12)}</tspan></text><text x="64" y="86" text-anchor="middle" font-size="7.92" fill="#1d4ed8" text-decoration="underline">設備 IP：<tspan font-weight="800">${esc(deviceIp).slice(0, 14)}</tspan></text></g>`;
+      }
+      if (node.type === "interface") {
+        const nodeFill = node.isVlan ? "#fce7f3" : (node.isClusterInterface ? "#b7e4cf" : "#edf9f5");
+        const nodeStroke = node.isVlan ? "#9d174d" : (node.isClusterInterface ? "#087f5b" : "#31a47f");
+        const labelColor = node.isVlan ? "#9d174d" : (node.isClusterInterface ? "#064e3b" : "#173f34");
+        const detailColor = node.isVlan ? "#9d174d" : "#167159";
+        const detailFontSize = 9.18;
+        if (node.isBondParent) {
+          const [, bondName = node.label, memberText = ""] = String(node.displayLabel || "").match(/^([^\s]+)\s*(.*)$/) || [];
+          return `<g class="drag-node" data-node="${esc(node.id)}" transform="translate(${node.x},${node.y})"><title>${esc(node.displayLabel)}</title><rect width="${node.w}" height="${node.h}" rx="7" fill="#e4f7ef" stroke="#087f5b" stroke-width="1.2" filter="url(#treeShadow)"/><text x="6" y="19" font-size="10.7" font-weight="800" fill="#064e3b">${esc(bondName)}</text><text x="6" y="37" font-size="7.2" font-weight="700" fill="#167159">${esc(memberText)}</text></g>`;
+        }
+        const primaryIp = node.ips[0] || "無 IP";
+        const clusterIpLine = node.clusterIps?.length ? `<text x="6" y="35" font-size="9.8" font-weight="800" fill="#7c3aed">Cluster IP：${esc(node.clusterIps.join("、")).slice(0, 25)}</text>` : "";
+        const ownerRows = node.isClusterInterface && node.ipOwners?.length ? `<text x="6" y="47" font-size="6.12" fill="${detailColor}">${node.ipOwners.slice(0, 2).map((owner, index) => { const hostPart=owner.ip.split("/")[0]; const lastOctet=hostPart.split(".").pop(); return `${index ? " / " : ""}${esc(owner.hostname)}：<tspan font-weight="800">${esc(lastOctet)}</tspan>`; }).join("")}</text>` : "";
+        const standaloneOwnerRows = node.isClusterInterface ? "" : (node.ipOwners?.length ? node.ipOwners.slice(0, 2).map((owner, index) => `<text x="6" y="${33 + index * 14}" font-size="${detailFontSize}" fill="${detailColor}">${esc(owner.hostname)}：<tspan font-weight="800">${esc(owner.ip)}</tspan>${owner.comment ? `（${esc(owner.comment).slice(0, 14)}）` : ""}</text>`).join("") : `<text x="6" y="33" font-size="${detailFontSize}" fill="${detailColor}">IP：<tspan font-weight="800">${esc(primaryIp)}</tspan></text>`);
+        const commentY = node.isClusterInterface ? 61 : 33 + Math.max(1, Math.min(2, node.ipOwners?.length || 1)) * 14;
+        const commentLine = node.comment && (node.isClusterInterface || !node.ipOwners?.length) ? `<text x="6" y="${commentY}" font-size="6.12" fill="#0f766e">註解：${esc(node.comment).slice(0, 22)}</text>` : "";
+        return `<g class="drag-node" data-node="${esc(node.id)}" transform="translate(${node.x},${node.y})"><title>${esc([node.displayLabel || node.label, ...((node.ipOwners?.length ? node.ipOwners.map(owner => `${owner.hostname}: ${owner.ip}`) : node.ips || []).map(String)), node.clusterIps?.length ? `Cluster IP: ${node.clusterIps.join(", ")}` : "", node.heartbeatEvidence ? `Heartbeat：依${node.heartbeatEvidence}判定` : "", node.comment].filter(Boolean).join("\n"))}</title><rect width="${node.w}" height="${node.h}" rx="7" fill="${nodeFill}" stroke="${nodeStroke}" stroke-width="${node.isClusterInterface ? "1.6" : ".8"}" filter="url(#treeShadow)"/><text x="6" y="18" font-size="10.7" font-weight="800" fill="${labelColor}">${esc(node.displayLabel || node.label)}</text>${clusterIpLine}${ownerRows}${standaloneOwnerRows}${commentLine}</g>`;
+      }
+      if (node.type === "next-hop") {
+        const routeSummary = node.routes[0]?.destination || "無目的網段";
+        const moreRoutes = node.routes.length > 1 ? ` +${node.routes.length - 1}` : "";
+        const allRoutes = node.routes.map(route => `${route.destination || "未指定目的網段"}${route.name ? ` (${route.name})` : ""}${route.comment ? `｜註解：${route.comment}` : ""}`).join("\n");
+        const sourceHosts = [...new Set(node.routes.flatMap(route => route.sourceHosts?.length ? route.sourceHosts : [route.name]).filter(Boolean))];
+        return `<g class="drag-node" data-node="${esc(node.id)}" data-next-hop="${esc(node.label)}" data-route-list="${esc(allRoutes)}" transform="translate(${node.x},${node.y})"><rect width="${node.w}" height="${node.h}" rx="7" fill="#f5f0ff" stroke="#8b5cf6" stroke-width=".8" filter="url(#treeShadow)"/><text x="6" y="17" font-size="8.4" font-weight="800" fill="#6541b5">Next Hop · <tspan font-weight="900">${esc(node.label)}</tspan></text><text x="6" y="35" font-size="6.12" fill="#75658f">${node.routes.length} 路由 · <tspan font-weight="800">${esc(routeSummary)}</tspan>${moreRoutes}</text><text x="6" y="50" font-size="6.12" fill="#ca8a04">來源主機：<tspan font-weight="800">${esc(sourceHosts.join(" / ")).slice(0, 28)}</tspan></text></g>`;
+      }
+      return "";
+    }
+
+    function updateTreeEdges(svg) {
+      const graph = treeUi.graph;
+      graph.edges.forEach((edge, index) => {
+        const path = svg.querySelector(`[data-edge="${index}"]`);
+        if (path) path.setAttribute("d", edgePath(graph.nodeMap.get(edge.from), graph.nodeMap.get(edge.to), edge));
+      });
+    }
+
+    function setTreeZoom(canvas, nextZoom, focus) {
+      const svg = canvas.querySelector(".tree-svg");
+      if (!svg) return;
+      const zoom = Math.max(.5, Math.min(3, nextZoom));
+      const beforeWidth = svg.getBoundingClientRect().width;
+      const beforeHeight = svg.getBoundingClientRect().height;
+      const focusX = focus?.x ?? canvas.clientWidth / 2;
+      const focusY = focus?.y ?? canvas.clientHeight / 2;
+      const ratioX = beforeWidth ? (canvas.scrollLeft + focusX) / beforeWidth : .5;
+      const ratioY = beforeHeight ? (canvas.scrollTop + focusY) / beforeHeight : .5;
+      treeUi.zoom = zoom;
+      const baseWidth = Number(svg.dataset.baseWidth);
+      const baseHeight = Number(svg.dataset.baseHeight);
+      svg.style.width = `${baseWidth * zoom}px`;
+      svg.style.height = `${baseHeight * zoom}px`;
+      const zoomLabel = $("#zoomLevel");
+      if (zoomLabel) zoomLabel.textContent = `${Math.round(zoom * 100)}%`;
+      requestAnimationFrame(() => {
+        canvas.scrollLeft = Math.max(0, ratioX * baseWidth * zoom - focusX);
+        canvas.scrollTop = Math.max(0, ratioY * baseHeight * zoom - focusY);
+      });
+    }
+
+    function setTreeSelection(svg, nodeId, options = {}) {
+      const graph = treeUi.graph;
+      const selectedIds = (Array.isArray(nodeId) ? nodeId : [nodeId]).filter(id => id && graph.nodeMap.has(id));
+      const includeDescendants = options.includeDescendants !== false;
+      const relatedNodes = new Set();
+      const relatedEdges = new Set();
+      if (selectedIds.length) {
+        const addNode = id => relatedNodes.add(id);
+        const addEdge = (edge, index) => { relatedEdges.add(index); addNode(edge.from); addNode(edge.to); };
+        const parentEdges = id => graph.edges.map((edge, index) => ({ edge, index })).filter(({ edge }) => !edge.relation && edge.to === id);
+        const childEdges = id => graph.edges.map((edge, index) => ({ edge, index })).filter(({ edge }) => !edge.relation && edge.from === id);
+        const addAncestors = id => {
+          parentEdges(id).forEach(({ edge, index }) => { addEdge(edge, index); addAncestors(edge.from); });
+        };
+        const pending = [...selectedIds];
+        selectedIds.forEach(id => relatedNodes.add(id));
+        while (pending.length) {
+          const current = pending.shift();
+          addAncestors(current);
+          if (includeDescendants) childEdges(current).forEach(({ edge, index }) => {
+              const isNew = !relatedNodes.has(edge.to);
+              addEdge(edge, index);
+              if (isNew) pending.push(edge.to);
+            });
+        }
+        graph.edges.map((edge, index) => ({ edge, index })).filter(({ edge }) => edge.relation && (relatedNodes.has(edge.from) || relatedNodes.has(edge.to))).forEach(({ edge, index }) => {
+          addEdge(edge, index);
+          addAncestors(edge.from);
+          addAncestors(edge.to);
+        });
+      }
+      treeUi.selectedNodeId = relatedNodes.size ? selectedIds[0] : null;
+      svg.classList.toggle("has-selection", relatedNodes.size > 0);
+      svg.querySelectorAll(".drag-node").forEach(element => {
+        const isRelated = relatedNodes.has(element.dataset.node);
+        element.classList.toggle("is-related", isRelated);
+        element.classList.toggle("is-selected", selectedIds.includes(element.dataset.node) && isRelated);
+      });
+      svg.querySelectorAll("[data-edge]").forEach(element => {
+        element.classList.toggle("is-related", relatedEdges.has(Number(element.dataset.edge)));
+      });
+    }
+
+    function bindTreeDrag(svg) {
+      let active = null;
+      let suppressClick = false;
+      const descendantsOf = nodeId => {
+        const descendants = new Set();
+        const pending = [nodeId];
+        while (pending.length) {
+          const parentId = pending.shift();
+          treeUi.graph.edges.filter(edge => !edge.relation && edge.from === parentId).forEach(edge => {
+            if (descendants.has(edge.to)) return;
+            descendants.add(edge.to);
+            pending.push(edge.to);
+          });
+        }
+        return [...descendants].map(id => treeUi.graph.nodeMap.get(id)).filter(Boolean);
+      };
+      const point = event => {
+        const rect = svg.getBoundingClientRect();
+        return { x: (event.clientX - rect.left) * treeUi.graph.width / rect.width, y: (event.clientY - rect.top) * treeUi.graph.height / rect.height };
+      };
+      svg.addEventListener("pointerdown", event => {
+        const element = event.target.closest(".drag-node");
+        if (!element) return;
+        const node = treeUi.graph.nodeMap.get(element.dataset.node);
+        if (node?.type === "interface") {
+          selectRouteInterface(node.device?.hostname, node.label);
+        } else if (node?.type === "next-hop") {
+          const route = node.routes?.[0];
+          selectRouteInterface(node.device?.hostname, route ? displayRouteInterface(route) : "");
+        }
+        setTreeSelection(svg, node.id);
+        const p = point(event);
+        const followers = (node.type === "root" || node.type === "interface" || node.isBondParent) ? descendantsOf(node.id).map(child => ({
+          node: child,
+          element: svg.querySelector(`.drag-node[data-node="${child.id}"]`),
+          x: child.x,
+          y: child.y
+        })) : [];
+        active = { element, node, dx: p.x - node.x, dy: p.y - node.y, startX: p.x, startY: p.y, originX: node.x, originY: node.y, followers, moved: false };
+        element.classList.add("dragging");
+        svg.setPointerCapture(event.pointerId);
+      });
+      svg.addEventListener("pointermove", event => {
+        if (!active) return;
+        const p = point(event);
+        if (Math.hypot(p.x - active.startX, p.y - active.startY) > 4) active.moved = true;
+        active.node.x = Math.max(0, Math.min(treeUi.graph.width - active.node.w, p.x - active.dx));
+        active.node.y = Math.max(0, Math.min(treeUi.graph.height - active.node.h, p.y - active.dy));
+        const deltaX = active.node.x - active.originX;
+        const deltaY = active.node.y - active.originY;
+        treeUi.positions.set(active.node.id, { x: active.node.x, y: active.node.y });
+        active.element.setAttribute("transform", `translate(${active.node.x},${active.node.y})`);
+        active.followers.forEach(follower => {
+          follower.node.x = Math.max(0, Math.min(treeUi.graph.width - follower.node.w, follower.x + deltaX));
+          follower.node.y = Math.max(0, Math.min(treeUi.graph.height - follower.node.h, follower.y + deltaY));
+          treeUi.positions.set(follower.node.id, { x: follower.node.x, y: follower.node.y });
+          follower.element?.setAttribute("transform", `translate(${follower.node.x},${follower.node.y})`);
+        });
+        updateTreeEdges(svg);
+      });
+      const finish = event => {
+        if (!active) return;
+        const selected = active;
+        selected.element.classList.remove("dragging");
+        active = null;
+        if (selected.moved) {
+          suppressClick = true;
+          setTimeout(() => { suppressClick = false; }, 0);
+        } else setTreeSelection(svg, selected.node.id);
+        if (svg.hasPointerCapture(event.pointerId)) svg.releasePointerCapture(event.pointerId);
+      };
+      svg.addEventListener("pointerup", finish);
+      svg.addEventListener("pointercancel", finish);
+      svg.addEventListener("click", event => {
+        if (suppressClick) return;
+        const element = event.target.closest(".drag-node");
+        const node = element ? treeUi.graph.nodeMap.get(element.dataset.node) : null;
+        if (node?.type === "interface") {
+          selectRouteInterface(node.device?.hostname, node.label);
+        } else if (node?.type === "next-hop") {
+          const route = node.routes?.[0];
+          selectRouteInterface(node.device?.hostname, route ? displayRouteInterface(route) : "");
+        }
+        setTreeSelection(svg, node?.id || null);
+        event.stopPropagation();
+      });
+    }
+
+    function bindNextHopTooltip(svg) {
+      const tooltip = $("#routeTooltip");
+      const move = event => {
+        const left = Math.min(window.innerWidth - tooltip.offsetWidth - 12, event.clientX + 16);
+        const top = Math.min(window.innerHeight - tooltip.offsetHeight - 12, event.clientY + 16);
+        tooltip.style.left = `${Math.max(12, left)}px`;
+        tooltip.style.top = `${Math.max(12, top)}px`;
+      };
+      svg.querySelectorAll(".drag-node[data-route-list]").forEach(node => {
+        node.addEventListener("pointerenter", event => {
+          const routes = (node.dataset.routeList || "").split("\n").filter(Boolean);
+          tooltip.textContent = `Next Hop ${node.dataset.nextHop}\n全部 ${routes.length} 條路由\n\n${routes.map((route, index) => `${index + 1}. ${route}`).join("\n")}`;
+          tooltip.style.display = "block";
+          move(event);
+        });
+        node.addEventListener("pointermove", move);
+        node.addEventListener("pointerleave", () => { tooltip.style.display = "none"; });
+      });
+    }
+
+    function bindPingSourceIcons(svg) {
+      const tooltip = $("#routeTooltip");
+      const move = event => {
+        const left = Math.min(window.innerWidth - tooltip.offsetWidth - 12, event.clientX + 16);
+        const top = Math.min(window.innerHeight - tooltip.offsetHeight - 12, event.clientY + 16);
+        tooltip.style.left = `${Math.max(12, left)}px`;
+        tooltip.style.top = `${Math.max(12, top)}px`;
+      };
+      svg.querySelectorAll(".drag-node[data-node]").forEach(element => {
+        const node = treeUi.graph.nodeMap.get(element.dataset.node);
+        if (node?.type !== "next-hop" || !isIpv4(node.label)) return;
+        const command = `ping ${node.label}`;
+        const icon = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        const x = node.w - 10, y = node.policies?.length ? 23 : 8;
+        icon.setAttribute("class", "ping-icon");
+        icon.setAttribute("aria-label", `複製 ping ${node.label}`);
+        icon.innerHTML = `<title>複製 ping ${esc(node.label)}</title><circle cx="${x}" cy="${y}" r="6" fill="#2563eb" stroke="#ffffff" stroke-width="1.2"/><text x="${x}" y="${y + 2.1}" text-anchor="middle" font-size="4.7" font-weight="900" fill="#ffffff">P</text>`;
+        icon.addEventListener("pointerdown", event => event.stopPropagation());
+        icon.addEventListener("click", event => {
+          event.stopPropagation();
+          copyTextToClipboard(command, "已複製 Ping 指令", "無法自動複製 Ping 指令，請確認瀏覽器剪貼簿權限");
+        });
+        icon.addEventListener("pointerenter", event => {
+          tooltip.textContent = `複製 ping ${node.label}`;
+          tooltip.style.display = "block";
+          move(event);
+        });
+        icon.addEventListener("pointermove", move);
+        icon.addEventListener("pointerleave", () => { tooltip.style.display = "none"; });
+        element.append(icon);
+      });
+    }
+
+    function bindRootIpLinks(svg) {
+      svg.querySelectorAll(".drag-node[data-node]").forEach(element => {
+        const node = treeUi.graph.nodeMap.get(element.dataset.node);
+        const deviceIp = String(node?.device?.managementIp || "").trim();
+        if (node?.type !== "root" || !isIpv4(deviceIp)) return;
+        const link = document.createElementNS("http://www.w3.org/2000/svg", "a");
+        link.setAttribute("class", "root-ip-link");
+        link.setAttribute("href", `https://${deviceIp}/`);
+        link.setAttribute("target", "_blank");
+        link.setAttribute("rel", "noopener noreferrer");
+        link.setAttribute("aria-label", `開啟設備管理頁：${deviceIp}`);
+        link.innerHTML = '<rect x="8" y="74" width="112" height="22" rx="5" fill="transparent" pointer-events="all"/>';
+        link.addEventListener("pointerdown", event => event.stopPropagation());
+        link.addEventListener("click", event => event.stopPropagation());
+        element.append(link);
+      });
+    }
+
+    function bindSupplementNextHops(svg) {
+      svg.querySelectorAll(".drag-node[data-node]").forEach(element => {
+        const node = treeUi.graph.nodeMap.get(element.dataset.node);
+        const supplementEntries = node?.type === "next-hop" ? state.supplements.get(node.label) : null;
+        if (!supplementEntries?.length) return;
+        const hostnames = [...new Set(supplementEntries.map(entry => entry.hostname))];
+        const remarks = [...new Set(supplementEntries.map(entry => entry.remark).filter(Boolean))];
+        const grouped = Boolean(node.supplementHost);
+        const color = grouped ? "#ffffff" : "#9a3412";
+        const rect = [...element.children].find(child => child.localName === "rect");
+        const texts = [...element.children].filter(child => child.localName === "text");
+        if (rect) {
+          rect.setAttribute("fill", grouped ? "#065f46" : "#fff1e5");
+          rect.setAttribute("stroke", grouped ? "#064e3b" : "#9a3412");
+          rect.setAttribute("stroke-width", "1.2");
+        }
+        if (texts[0]) {
+          texts[0].setAttribute("fill", color);
+          texts[0].setAttribute("font-size", "6.84");
+          texts[0].setAttribute("y", "17");
+          if (grouped) {
+            texts[0].textContent = "INTERFACE · ";
+            const interfaceIp = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+            interfaceIp.setAttribute("font-weight", "800");
+            interfaceIp.textContent = node.label;
+            texts[0].append(interfaceIp);
+          }
+        }
+        if (texts[1]) {
+          texts[1].setAttribute("fill", color);
+          texts[1].setAttribute("y", "35");
+          texts[1].textContent = "主機：";
+          const hostname = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+          hostname.setAttribute("font-size", "9.18");
+          hostname.setAttribute("font-weight", "800");
+          hostname.textContent = hostnames.join(" / ");
+          texts[1].append(hostname);
+        }
+        if (texts[2]) texts[2].setAttribute("fill", grouped ? "#facc15" : "#ca8a04");
+        const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        title.textContent = `Next Hop ${node.label}：${hostnames.join(" / ")}${remarks.length ? `（${remarks.join(" / ")}）` : ""}`;
+        element.prepend(title);
+      });
+    }
+
+    function applyTopologyHostFilter(svg, host) {
+      const graph = treeUi.graph;
+      const visibleNodes = new Set();
+      const belongsToHost = device => device?.hostname === host || device?.clusterMembers?.some(member => member.hostname === host);
+      if (host) {
+        graph.nodes.filter(node => belongsToHost(node.device)).forEach(node => visibleNodes.add(node.id));
+      }
+      svg.classList.toggle("has-host-filter", Boolean(host));
+      svg.querySelectorAll(".drag-node").forEach(element => element.classList.toggle("is-filtered-out", Boolean(host) && !visibleNodes.has(element.dataset.node)));
+      graph.edges.forEach((edge, index) => {
+        const fromDevice = graph.nodeMap.get(edge.from)?.device;
+        const toDevice = graph.nodeMap.get(edge.to)?.device;
+        const isVisible = !host || (belongsToHost(fromDevice) && belongsToHost(toDevice));
+        svg.querySelector(`[data-edge="${index}"]`)?.classList.toggle("is-filtered-out", !isVisible);
+      });
+    }
+
+    function exportTopologyPng(svg) {
+      const graph = treeUi.graph;
+      const copy = svg.cloneNode(true);
+      if (!treeUi.showRelatedRoutes) copy.querySelectorAll('path[data-edge-type="route-related"]').forEach(path => path.remove());
+      if (!treeUi.showGatewayLinks) copy.querySelectorAll('path[data-edge-type="gateway-link"]').forEach(path => path.remove());
+      copy.removeAttribute("style");
+      copy.setAttribute("width", graph.width);
+      copy.setAttribute("height", graph.height);
+      copy.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+      const xml = new XMLSerializer().serializeToString(copy).replace(">", `><rect width="100%" height="100%" fill="#f8fbff"/>`);
+      const svgUrl = URL.createObjectURL(new Blob([xml], { type: "image/svg+xml;charset=utf-8" }));
+      const image = new Image();
+      image.onload = () => {
+        const output = document.createElement("canvas");
+        output.width = graph.width * 2;
+        output.height = graph.height * 2;
+        const context = output.getContext("2d");
+        context.fillStyle = "#f8fbff";
+        context.fillRect(0, 0, output.width, output.height);
+        context.drawImage(image, 0, 0, output.width, output.height);
+        URL.revokeObjectURL(svgUrl);
+        output.toBlob(blob => {
+          if (!blob) return;
+          const link = document.createElement("a");
+          const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+          link.href = URL.createObjectURL(blob);
+          link.download = `checkpoint-network-topology-${stamp}.png`;
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(link.href), 0);
+        }, "image/png");
+      };
+      image.onerror = () => { URL.revokeObjectURL(svgUrl); show("PNG 匯出失敗，請再試一次"); };
+      image.src = svgUrl;
+    }
+
+    function bindCanvasPan(canvas) {
+      let active = null;
+      canvas.classList.add("has-tree");
+      canvas.addEventListener("pointerdown", event => {
+        if (event.button !== 0 || event.target.closest(".drag-node")) return;
+        active = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, left: canvas.scrollLeft, top: canvas.scrollTop, moved: false };
+        canvas.setPointerCapture(event.pointerId);
+      });
+      canvas.addEventListener("pointermove", event => {
+        if (!active || active.pointerId !== event.pointerId) return;
+        const dx = event.clientX - active.x, dy = event.clientY - active.y;
+        if (Math.abs(dx) > 2 || Math.abs(dy) > 2) active.moved = true;
+        if (!active.moved) return;
+        canvas.classList.add("panning");
+        canvas.scrollLeft = active.left - dx;
+        canvas.scrollTop = active.top - dy;
+      });
+      const finish = event => {
+        if (!active || active.pointerId !== event.pointerId) return;
+        if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+        active = null;
+        canvas.classList.remove("panning");
+      };
+      canvas.addEventListener("pointerup", finish);
+      canvas.addEventListener("pointercancel", finish);
+    }
+
+    function renderFilteredInterfaces(interfaces) {
+      const filtered = interfaces.filter(item => !treeUi.interfaceHost || item.host === treeUi.interfaceHost);
+      $("#ifaceBody").innerHTML = filtered.map(item => { const label=item.members?.length ? `${item.name.replace(/^bond/i, "Bond")} (${item.members.join(" + ")})` : item.name; return `<tr><td><b>${esc(item.host)}</b></td><td><span class="pill">${esc(label)}</span></td><td>${item.ips.map(ip => `<span class="pill">${esc(ip)}</span>`).join("") || "—"}</td><td>${item.clusterIps?.map(ip => `<span class="pill route">${esc(ip)}</span>`).join("") || "—"}</td><td>${esc(item.comment || "—")}</td></tr>`; }).join("") || '<tr><td colspan="5">查無符合條件的介面</td></tr>';
+      $("#ifaceFilterResult").textContent = `顯示 ${filtered.length}／${interfaces.length} 個介面`;
+    }
+
+    function bindInterfaceFilter(interfaces) {
+      const filter = $("#ifaceHostFilter");
+      const hosts = [...new Set(interfaces.map(item => item.host))].sort();
+      filter.innerHTML = `<option value="">全部主機</option>${hosts.map(host => `<option value="${esc(host)}">${esc(hostLabel(host))}</option>`).join("")}`;
+      if (!hosts.includes(treeUi.interfaceHost)) treeUi.interfaceHost = "";
+      filter.value = treeUi.interfaceHost;
+      filter.onchange = () => { treeUi.interfaceHost = filter.value; renderFilteredInterfaces(interfaces); };
+      $("#clearIfaceFilter").onclick = () => { treeUi.interfaceHost = ""; filter.value = ""; renderFilteredInterfaces(interfaces); };
+      renderFilteredInterfaces(interfaces);
+    }
+
+    function routePrefixLength(destination) {
+      const bits = Number(String(destination || "").split("/")[1]);
+      return Number.isInteger(bits) && bits >= 0 && bits <= 32 ? bits : -1;
+    }
+
+    function displayRouteInterface(route) {
+      if (route.iface && route.iface !== "—") return route.iface;
+      const device = state.model?.devicesByHost.get(route.name);
+      return device ? ownerInterface(device, route)?.name || "未指定介面" : "未指定介面";
+    }
+
+    function selectRouteInterface(host, interfaceName) {
+      if (!host || !interfaceName) return;
+      treeUi.routeFilter = { host, destination: "", iface: interfaceName, nextHop: "" };
+      const hostFilter = $("#routeHostFilter");
+      const destinationFilter = $("#routeDestinationFilter");
+      const interfaceFilter = $("#routeInterfaceFilter");
+      const nextHopFilter = $("#routeNextHopFilter");
+      if (hostFilter) hostFilter.value = host;
+      if (destinationFilter) destinationFilter.value = "";
+      if (interfaceFilter) interfaceFilter.value = interfaceName;
+      if (nextHopFilter) nextHopFilter.value = "";
+      renderFilteredRoutes(state.model?.routes || []);
+    }
+
+    function highlightLookupRoutes(routes) {
+      const svg = $("#canvas .tree-svg");
+      const graph = treeUi.graph;
+      if (!svg || !graph) return;
+      const nodeBelongsToHost = (node, host) => node.device?.hostname === host || node.device?.clusterMembers?.some(member => member.hostname === host);
+      const nodeIds = new Set();
+      routes.forEach(route => {
+        const interfaceName = displayRouteInterface(route);
+        const interfaceNodes = graph.nodes.filter(node => node.type === "interface" && nodeBelongsToHost(node, route.name) && node.label === interfaceName);
+        interfaceNodes.forEach(node => nodeIds.add(node.id));
+        graph.nodes.filter(node => node.type === "next-hop" && nodeBelongsToHost(node, route.name) && node.label === route.nextHop && node.routes.some(item => item.destination === route.destination && item.nextHop === route.nextHop)).forEach(node => nodeIds.add(node.id));
+      });
+      if (!nodeIds.size) return;
+      treeUi.topologyHost = routes[0].name;
+      const topologyFilter = $("#topologyHostFilter");
+      if (topologyFilter) topologyFilter.value = treeUi.topologyHost;
+      applyTopologyHostFilter(svg, treeUi.topologyHost);
+      setTreeSelection(svg, [...nodeIds], { includeDescendants: false });
+    }
+
+    function highlightLookupInterfaces(host, interfaceNames) {
+      const svg = $("#canvas .tree-svg");
+      const graph = treeUi.graph;
+      if (!svg || !graph) return;
+      const names = new Set(interfaceNames);
+      const nodeIds = graph.nodes
+        .filter(node => node.type === "interface" && (node.device?.hostname === host || node.device?.clusterMembers?.some(member => member.hostname === host)) && names.has(node.label))
+        .map(node => node.id);
+      if (!nodeIds.length) return;
+      treeUi.topologyHost = host;
+      const topologyFilter = $("#topologyHostFilter");
+      if (topologyFilter) topologyFilter.value = host;
+      applyTopologyHostFilter(svg, host);
+      setTreeSelection(svg, nodeIds, { includeDescendants: false });
+    }
+
+    function runRouteLookup(routes) {
+      const { host, destination } = treeUi.routeLookup;
+      const result = $("#routeLookupResult");
+      const clearHighlight = () => { const svg = $("#canvas .tree-svg"); if (svg) setTreeSelection(svg, null); };
+      if (!host) { clearHighlight(); result.textContent = "請先選擇要查詢的主機"; return; }
+      if (!isValidIpv4(destination)) { clearHighlight(); result.textContent = "請輸入有效的 IPv4 目的 IP"; return; }
+      const device = state.model?.devicesByHost.get(host);
+      const directlyConnected = (device?.ifaces || []).flatMap(iface =>
+        (iface.ips || []).filter(cidr => ipv4InCidr(destination, cidr)).map(cidr => ({ iface, cidr }))
+      );
+      const directInterfaces = [...new Map(directlyConnected.map(item => [item.iface.name, item])).values()];
+      if (directInterfaces.length) {
+        const interfaceNames = directInterfaces.map(item => item.iface.name);
+        result.textContent = `直接連接：${hostLabel(host)} 的 ${interfaceNames.join("、")} 介面`;
+        highlightLookupInterfaces(host, interfaceNames);
+        return;
+      }
+      const hostRoutes = state.model?.routesByHost.get(host) || routes.filter(route => route.name === host);
+      const matches = hostRoutes.filter(route => ipv4InCidr(destination, route.destination));
+      if (!matches.length) { clearHighlight(); result.textContent = "查無命中的靜態路由"; return; }
+      const longestPrefix = Math.max(...matches.map(route => routePrefixLength(route.destination)));
+      const best = matches.filter(route => routePrefixLength(route.destination) === longestPrefix);
+      result.textContent = `命中 ${best.length > 1 ? `${best.length} 條同前綴路由` : "路由"}：${best.map(route => `${route.destination} → ${route.nextHop || "—"}（經由 ${displayRouteInterface(route)}）${route.comment ? `［註解：${route.comment}］` : ""}`).join("；")}`;
+      highlightLookupRoutes(best);
+    }
+
+    function bindRouteLookup(routes) {
+      const hostFilter = $("#lookupHostFilter");
+      const destinationInput = $("#lookupDestination");
+      const hosts = [...new Set((state.model?.devices || []).map(device => device.hostname).concat(routes.map(route => route.name)))].sort();
+      hostFilter.innerHTML = `<option value="">請選擇主機</option>${hosts.map(host => `<option value="${esc(host)}">${esc(hostLabel(host))}</option>`).join("")}`;
+      if (!hosts.includes(treeUi.routeLookup.host)) treeUi.routeLookup.host = "";
+      hostFilter.value = treeUi.routeLookup.host;
+      destinationInput.value = treeUi.routeLookup.destination;
+      hostFilter.onchange = () => { treeUi.routeLookup.host = hostFilter.value; };
+      destinationInput.oninput = () => { treeUi.routeLookup.destination = destinationInput.value.trim(); };
+      destinationInput.onkeydown = event => { if (event.key === "Enter") { event.preventDefault(); runRouteLookup(routes); } };
+      $("#runRouteLookup").onclick = () => {
+        treeUi.routeLookup = { host: hostFilter.value, destination: destinationInput.value.trim() };
+        runRouteLookup(routes);
+      };
+    }
+
+    function renderFilteredRoutes(routes) {
+      const { host, destination, iface, nextHop } = treeUi.routeFilter;
+      const keyword = destination.trim().toLowerCase();
+      const filtered = routes.filter(route => {
+        const interfaceName = displayRouteInterface(route);
+        return (!host || route.name === host) && (!iface || interfaceName === iface) && (!nextHop || route.nextHop === nextHop) && (!keyword || `${route.destination} ${route.nextHop} ${interfaceName} ${route.comment || ""}`.toLowerCase().includes(keyword));
+      });
+      $("#routeBody").innerHTML = filtered.map(route => `<tr><td><b>${esc(route.name)}</b></td><td><span class="pill route">${esc(route.destination)}</span></td><td>${esc(route.nextHop)}</td><td>${esc(displayRouteInterface(route))}</td><td>${esc(route.comment || "—")}</td></tr>`).join("") || '<tr><td colspan="5">查無符合條件的路由</td></tr>';
+      $("#routeFilterResult").textContent = `顯示 ${filtered.length}／${routes.length} 條路由`;
+    }
+
+    function bindRouteFilter(routes) {
+      const hostFilter = $("#routeHostFilter");
+      const destinationFilter = $("#routeDestinationFilter");
+      const interfaceFilter = $("#routeInterfaceFilter");
+      const nextHopFilter = $("#routeNextHopFilter");
+      const hosts = [...new Set(routes.map(route => route.name))].sort();
+      const interfaces = [...new Set((state.model?.interfaces || []).map(item => item.name).concat(routes.map(route => displayRouteInterface(route))).filter(Boolean))].sort();
+      const nextHops = [...new Set(routes.map(route => route.nextHop).filter(Boolean))].sort();
+      hostFilter.innerHTML = `<option value="">全部主機</option>${hosts.map(host => `<option value="${esc(host)}">${esc(hostLabel(host))}</option>`).join("")}`;
+      interfaceFilter.innerHTML = `<option value="">全部介面</option>${interfaces.map(iface => `<option value="${esc(iface)}">${esc(iface)}</option>`).join("")}`;
+      nextHopFilter.innerHTML = `<option value="">全部 Next-hop</option>${nextHops.map(nextHop => `<option value="${esc(nextHop)}">${esc(nextHop)}</option>`).join("")}`;
+      if (!hosts.includes(treeUi.routeFilter.host)) treeUi.routeFilter.host = "";
+      if (!interfaces.includes(treeUi.routeFilter.iface)) treeUi.routeFilter.iface = "";
+      if (!nextHops.includes(treeUi.routeFilter.nextHop)) treeUi.routeFilter.nextHop = "";
+      hostFilter.value = treeUi.routeFilter.host;
+      destinationFilter.value = treeUi.routeFilter.destination;
+      interfaceFilter.value = treeUi.routeFilter.iface;
+      nextHopFilter.value = treeUi.routeFilter.nextHop;
+      hostFilter.onchange = () => { treeUi.routeFilter.host = hostFilter.value; renderFilteredRoutes(routes); };
+      destinationFilter.oninput = () => { treeUi.routeFilter.destination = destinationFilter.value; renderFilteredRoutes(routes); };
+      interfaceFilter.onchange = () => { treeUi.routeFilter.iface = interfaceFilter.value; renderFilteredRoutes(routes); };
+      nextHopFilter.onchange = () => { treeUi.routeFilter.nextHop = nextHopFilter.value; renderFilteredRoutes(routes); };
+      $("#clearRouteFilter").onclick = () => { treeUi.routeFilter = { host: "", destination: "", iface: "", nextHop: "" }; hostFilter.value = ""; destinationFilter.value = ""; interfaceFilter.value = ""; nextHopFilter.value = ""; renderFilteredRoutes(routes); };
+      renderFilteredRoutes(routes);
+    }
+
+    function draw() {
+      const model = state.model || (state.model = buildDataModel(state.data));
+      const { interfaces: allIf, routes: allRt } = model;
+      $("#sDevices").textContent = model.devices.length;
+      $("#sIfaces").textContent = allIf.length;
+      $("#sRoutes").textContent = allRt.length;
+      bindInterfaceFilter(allIf);
+      bindRouteLookup(allRt);
+      bindRouteFilter(allRt);
+      const tools = $("#treeTools");
+      const topologyHosts = [...model.devicesByHost.keys()].sort();
+      if (!topologyHosts.includes(treeUi.topologyHost)) treeUi.topologyHost = "";
+      const generatedAt = new Intl.DateTimeFormat("zh-TW", { dateStyle: "short", timeStyle: "medium", hour12: false }).format(new Date());
+      tools.innerHTML = `<label class="topology-filter">篩選主機<select id="topologyHostFilter"><option value="">全部主機</option>${topologyHosts.map(host => `<option value="${esc(host)}">${esc(hostLabel(host))}</option>`).join("")}</select></label><label class="topology-toggle"><input id="showGatewayLinks" type="checkbox" ${treeUi.showGatewayLinks ? "checked" : ""} />顯示 Next Hop 對端</label><label class="topology-toggle"><input id="showRelatedRoutes" type="checkbox" ${treeUi.showRelatedRoutes ? "checked" : ""} />顯示相關路由</label><button type="button" id="resetTree">恢復圓形排列</button><button type="button" id="zoomOut" aria-label="縮小拓樸">−</button><span class="zoom-level" id="zoomLevel">100%</span><button type="button" id="zoomIn" aria-label="放大拓樸">＋</button><button type="button" id="zoomFit">符合畫面</button><button type="button" id="exportPng">儲存 PNG</button><span class="hint">Next Hop 停留可查看全部路由；滾輪縮放，空白處可平移</span><span class="generated-at">圖形產生時間：${generatedAt}</span>`;
+      $("#topologyHostFilter").value = treeUi.topologyHost;
+      treeUi.graph = makeTreeGraph();
+      const graph = treeUi.graph;
+      $("#topoMeta").textContent = `${graph.rootCount} 個 ROOT · ${allIf.length} 個 Interface · ${graph.nextHopCount} 個 Next Hop 分類 · ${allRt.length} 條路由${model.devices.length > graph.rootCount ? ` · 已合併 ${model.devices.length - graph.rootCount} 台 Cluster 成員` : ""}${graph.relationCount ? ` · ${graph.relationCount} 條跨設備關聯` : ""}`;
+      $("#resetTree").onclick = () => { treeUi.positions.clear(); draw(); };
+      const edgeStyles = {
+        root: { color: "#8eb3e9", width: 2 },
+        interface: { color: "#86cbb4", width: 2 }, "next-hop": { color: "#a78bfa", width: 1.5 },
+        "gateway-link": { color: "#7c3aed", width: 1.7, dash: "6 5" },
+        "route-related": { color: "#d946ef", width: 1.6, dash: "5 5" },
+        "sms-route": { color: "#c2410c", width: 2, dash: "7 4" },
+        "supplement-link": { color: "#64748b", width: 1.8 }
+      };
+      const orderedEdges = [...graph.edges.filter(edge => edge.relation), ...graph.edges.filter(edge => !edge.relation)];
+      graph.edges = orderedEdges;
+      const ringGuides = graph.ringGuides.map(guide => `<circle cx="${guide.x}" cy="${guide.y}" r="${guide.radius}" fill="none" stroke="#cfd8e8" stroke-width="1" stroke-dasharray="${guide.index % 2 ? "5 7" : "2 8"}" opacity=".65"/>`).join("");
+      const edges = graph.edges.map((edge, index) => {
+        const style = edgeStyles[edge.type];
+        const marker = edge.type === "gateway-link" ? ' marker-end="url(#gatewayArrow)"' : "";
+        const dash = style.dash ? ` stroke-dasharray="${style.dash}"` : "";
+        return `<path data-edge="${index}" data-edge-type="${edge.type}" d="${edgePath(graph.nodeMap.get(edge.from), graph.nodeMap.get(edge.to), edge)}" fill="none" stroke="${style.color}" stroke-width="${style.width}"${dash}${marker} opacity="${edge.relation ? ".82" : "1"}"><title>${esc(edge.title || "拓樸連線")}</title></path>`;
+      }).join("");
+      const nodes = graph.nodes.map(nodeMarkup).join("");
+      const canvas = $("#canvas");
+      const baseWidth = canvas.clientWidth;
+      const baseHeight = Math.round(baseWidth * graph.height / graph.width);
+      const svgStyle = `width:${baseWidth * treeUi.zoom}px;height:${baseHeight * treeUi.zoom}px`;
+      canvas.innerHTML = `<svg class="tree-svg" data-base-width="${baseWidth}" data-base-height="${baseHeight}" viewBox="0 0 ${graph.width} ${graph.height}" preserveAspectRatio="xMidYMid meet" style="${svgStyle}" role="img" aria-label="每台設備各自形成圓狀拓樸，ROOT 位於群組中心，Interface 與依路由分類的 Next Hop IP 環繞展開，並標示跨設備關聯"><defs><filter id="treeShadow"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#172033" flood-opacity=".12"/></filter><marker id="gatewayArrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#7c3aed"/></marker></defs><g aria-hidden="true">${ringGuides}</g>${edges}${nodes}</svg>`;
+      const treeSvg = canvas.querySelector("svg");
+      treeSvg.classList.toggle("hide-related-routes", !treeUi.showRelatedRoutes);
+      treeSvg.classList.toggle("hide-gateway-links", !treeUi.showGatewayLinks);
+      bindTreeDrag(treeSvg);
+      bindNextHopTooltip(treeSvg);
+      bindPingSourceIcons(treeSvg);
+      bindRootIpLinks(treeSvg);
+      bindSupplementNextHops(treeSvg);
+      if (treeUi.selectedNodeId && graph.nodeMap.has(treeUi.selectedNodeId)) setTreeSelection(treeSvg, treeUi.selectedNodeId);
+      else treeUi.selectedNodeId = null;
+      applyTopologyHostFilter(treeSvg, treeUi.topologyHost);
+      $("#topologyHostFilter").onchange = event => {
+        treeUi.topologyHost = event.target.value;
+        applyTopologyHostFilter(treeSvg, treeUi.topologyHost);
+      };
+      $("#showRelatedRoutes").onchange = event => {
+        treeUi.showRelatedRoutes = event.target.checked;
+        treeSvg.classList.toggle("hide-related-routes", !treeUi.showRelatedRoutes);
+      };
+      $("#showGatewayLinks").onchange = event => {
+        treeUi.showGatewayLinks = event.target.checked;
+        treeSvg.classList.toggle("hide-gateway-links", !treeUi.showGatewayLinks);
+      };
+      $("#exportPng").onclick = () => exportTopologyPng(treeSvg);
+      bindCanvasPan(canvas);
+      $("#zoomOut").onclick = () => setTreeZoom(canvas, treeUi.zoom - .15);
+      $("#zoomIn").onclick = () => setTreeZoom(canvas, treeUi.zoom + .15);
+      $("#zoomFit").onclick = () => setTreeZoom(canvas, 1);
+      canvas.onwheel = event => {
+        event.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        setTreeZoom(canvas, treeUi.zoom + (event.deltaY < 0 ? .12 : -.12), { x: event.clientX - rect.left, y: event.clientY - rect.top });
+      };
+      $("#zoomLevel").textContent = `${Math.round(treeUi.zoom * 100)}%`;
+      requestAnimationFrame(() => {
+        canvas.scrollLeft = Math.max(0, (baseWidth * treeUi.zoom - canvas.clientWidth) / 2);
+        canvas.scrollTop = Math.max(0, (baseHeight * treeUi.zoom - canvas.clientHeight) / 2);
+      });
+    }
+    // renderBtn 的原始處理器已會呼叫目前的 draw；保留原流程，避免重複繪圖。
+  </script>
+</body></html>
