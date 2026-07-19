@@ -7,7 +7,7 @@
   <style>
     :root{--panel:#fff;--ink:#172033;--muted:#687386;--line:#dce2ec;--blue:#2563eb;--green:#0f9f78;--shadow:0 12px 32px #12203d12}
     *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 70% -10%,#dceeff 0,#f5f7fb 34rem);color:var(--ink);font-family:Inter,"Noto Sans TC","Microsoft JhengHei",sans-serif}
-    .shell{max-width:1500px;margin:auto;padding:30px 34px 50px}.eyebrow{color:var(--blue);font-size:12px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}.top{display:flex;justify-content:space-between;gap:25px;align-items:flex-end;margin-bottom:24px}.top h1{margin:6px 0 7px;font-size:32px;letter-spacing:-.03em}.top p{margin:0;color:var(--muted);font-size:14px}.privacy{font-size:12px;color:#3f647d;background:#e9f6ff;border:1px solid #c9e7f7;border-radius:999px;padding:9px 13px;white-space:nowrap}
+    .shell{max-width:1500px;margin:auto;padding:30px 34px 50px}.eyebrow-row{display:flex;align-items:center;gap:10px}.eyebrow{color:var(--blue);font-size:12px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}.edited-at{color:var(--muted);font-size:11px;font-weight:600;letter-spacing:normal}.top{display:flex;justify-content:space-between;gap:25px;align-items:flex-end;margin-bottom:24px}.top h1{margin:6px 0 7px;font-size:32px;letter-spacing:-.03em}.top p{margin:0;color:var(--muted);font-size:14px}.privacy{font-size:12px;color:#3f647d;background:#e9f6ff;border:1px solid #c9e7f7;border-radius:999px;padding:9px 13px;white-space:nowrap}
     .grid{display:grid;gap:20px;min-width:0}.panel{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}.control{padding:20px}.control h2,.section-head h2{font-size:16px;margin:0 0 5px}.help{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 16px}.drop{border:1.5px dashed #9ab4d8;border-radius:14px;background:#f7faff;padding:19px;text-align:center;cursor:pointer;transition:.2s}.drop:hover,.drop.drag{border-color:var(--blue);background:#eef5ff}.drop strong{display:block;font-size:14px}.drop span{font-size:12px;color:var(--muted);display:block;margin-top:7px}.drop input{display:none}.file-list{margin:15px 0;display:grid;gap:8px}.file{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:11px;padding:9px 10px;font-size:12px}.file .dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex:0 0 auto}.file .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.remove{border:0;background:none;color:#9aa5b6;cursor:pointer;font-size:16px}.actions{display:flex;gap:8px}.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:700;font-size:12px;cursor:pointer}.primary{background:var(--blue);color:#fff;flex:1}.secondary{background:#edf1f7;color:#41506a}.status{min-height:19px;color:var(--muted);font-size:12px;margin-top:12px}.content{display:grid;gap:20px;min-width:0}.section-head{display:flex;justify-content:space-between;align-items:center;padding:18px 20px 0}.section-head .meta{font-size:12px;color:var(--muted)}.canvas-wrap{padding:14px 0 20px;min-width:0}.canvas{width:100%;max-width:100%;height:700px;min-height:700px;border-radius:14px;background:linear-gradient(180deg,#f8fbff,#f8f9fc);border:1px solid #e5eaf2;overflow:auto;position:relative}.canvas svg{display:block;width:100%;min-width:760px;height:520px}.empty{display:grid;place-items:center;height:100%;color:var(--muted);text-align:center}.empty b{display:block;color:var(--ink);margin-bottom:8px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 20px 20px}.stat{padding:14px 15px;border-radius:13px;background:#f7f9fc;border:1px solid #e9edf4}.stat .n{font-size:22px;font-weight:800}.stat .l{font-size:11px;color:var(--muted);margin-top:3px}.details{display:grid;grid-template-columns:1fr 1fr;gap:20px;min-width:0}.table-wrap{padding:14px 20px 20px;overflow:auto;max-height:390px}table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;color:var(--muted);font-weight:700;background:#f7f9fc;position:sticky;top:0}td,th{padding:10px 9px;border-bottom:1px solid #edf0f5;vertical-align:top}.pill{display:inline-block;border-radius:999px;padding:3px 7px;background:#e8f1ff;color:#2457ab;font-size:11px;margin:2px 3px 2px 0}.route{background:#fff4dd;color:#98620a}.legend{display:flex;gap:13px;padding:0 20px 17px;font-size:11px;color:var(--muted);flex-wrap:wrap}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}.toast{position:fixed;right:22px;bottom:22px;background:#172033;color:#fff;padding:11px 14px;border-radius:10px;font-size:12px;display:none}.note{font-size:11px;color:var(--muted);line-height:1.5;padding:0 20px 20px}
     .tree-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:0 20px 12px}.tree-tools button{border:1px solid var(--line);background:#fff;color:#41506a;border-radius:9px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer}.tree-tools .hint{color:var(--muted);font-size:11px;margin-left:auto}.canvas.has-tree{cursor:grab}.canvas.has-tree.panning{cursor:grabbing;user-select:none}.tree-svg .drag-node{cursor:grab;touch-action:none}.tree-svg .drag-node.dragging{cursor:grabbing}.tree-svg text{pointer-events:none;user-select:none}.tree-svg.has-selection .drag-node:not(.is-related),.tree-svg.has-selection path[data-edge]:not(.is-related),.tree-svg.has-selection>g[aria-hidden="true"]{display:none}.tree-svg.has-selection .drag-node.is-related rect,.tree-svg.has-selection .drag-node.is-related circle{stroke-width:2.2px}.tree-svg.has-selection path[data-edge].is-related{opacity:1;stroke-width:5px;filter:drop-shadow(0 0 4px currentColor)}.tree-svg.has-selection .drag-node.is-selected rect,.tree-svg.has-selection .drag-node.is-selected circle{stroke-width:4px;filter:drop-shadow(0 0 7px #2563eb)}
     @media(max-width:950px){.shell{padding:22px 16px}.grid{grid-template-columns:1fr}.details{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:repeat(2,1fr)}.tree-tools .hint{width:100%;margin-left:0}.canvas{height:560px;min-height:560px}}
@@ -27,7 +27,7 @@
 </head>
 <body>
   <main class="shell">
-    <div class="top"><div><div class="eyebrow">Check Point</div><h1>Check Point 網路拓樸工具</h1><p>載入最多七份設定檔，快速還原介面與靜態路由關係。</p></div><div class="privacy">⌁ 全程在瀏覽器本機解析，不上傳設定檔</div></div>
+    <div class="top"><div><div class="eyebrow-row"><div class="eyebrow">Check Point</div><time class="edited-at" datetime="2026-07-19T19:52:00+08:00">最後編輯時間：2026-07-19 19:52</time></div><h1>Check Point 網路拓樸工具</h1><p>載入最多七份設定檔，快速還原介面與靜態路由關係。</p></div><div class="privacy">⌁ 全程在瀏覽器本機解析，不上傳設定檔</div></div>
     <aside class="panel control control-top">
         <div class="control-intro"><h2>匯入補充設備描述 (非必需)</h2><label class="supplement-upload"><span>補充說明 TXT（IP／主機／備註）</span><span class="btn-file">選取 TXT</span><input id="supplementFile" type="file" accept=".txt,text/plain" /><span class="file-name" id="supplementFileName">尚未選取</span></label></div>
         <label class="drop" id="drop"><strong>拖曳設定檔到這裡</strong><span>請上傳 "show configuration" 與 "cphaprob -a if" 的 .log 或 .txt 檔案</span><input id="files" type="file" accept=".log,.txt,text/plain" multiple /></label>
@@ -73,7 +73,7 @@
   <script>
     const $=s=>document.querySelector(s), state={files:[], data:[], model:null, supplements:new Map(), supplementFileName:"", supplementErrors:[], smsIp:"", renderVersion:0};
     $(".eyebrow").textContent = "Check Point 網路拓樸工具";
-    document.querySelector(".legend span:nth-of-type(6)").insertAdjacentHTML("afterend", '<span>相關路由定義：跨設備的 Next Hop 具有相同目的網段，或彼此路由涵蓋對方設備 IP；此為邏輯關聯，非實體連線。</span>');
+    document.querySelector(".legend span:nth-of-type(6)").insertAdjacentHTML("afterend", '<span>相關路由定義：僅在跨設備的路由彼此涵蓋對方設備 IP 時顯示；此為邏輯關聯，非實體連線。</span>');
     document.querySelector(".legend").insertAdjacentHTML("beforeend", '<span><i style="background:#9a3412"></i>TXT 補充主機名稱</span>');
     document.querySelector(".legend").insertAdjacentHTML("beforeend", '<span><i style="width:18px;height:0;border-top:2px solid #64748b;border-radius:0"></i>相同補充主機</span>');
     document.querySelector(".control-intro .supplement-upload").insertAdjacentHTML("afterend", '<label class="sms-input" style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:#687386">SMS 管理 IP<input id="smsIp" type="text" inputmode="decimal" placeholder="例如 10.0.0.10" style="width:154px;height:28px;border:1px solid #dce2ec;border-radius:8px;padding:0 8px;font:12px Inter,\'Noto Sans TC\',\'Microsoft JhengHei\',sans-serif" /><button id="smsIpConfirm" type="button" class="btn secondary" style="height:28px;padding:0 10px">確定</button></label>');
@@ -145,9 +145,19 @@
       const bondMembers = new Map();
       const comments = new Map();
       const routeRows = [];
+      const heartbeatInterfaces = new Set();
       let hasClusterMode = false;
       let managementInterface = "";
+      let hasCphaprobInterfaceOutput = false;
       lines.forEach(line => {
+        if (/\bcphaprob\s+-a\s+if\b/i.test(line) || /^\s*Interface Name\b/i.test(line)) hasCphaprobInterfaceOutput = true;
+        let heartbeatMatch = line.match(/^\s*Interface Name\s*:?\s*([A-Za-z][\w.-]*)\b.*\(\s*S\s*\)\s*$/i);
+        if (!heartbeatMatch && !/^\s*Interface Name\b/i.test(line)) heartbeatMatch = line.match(/^\s*([A-Za-z][\w.-]*)\b.*\(\s*S\s*\)\s*$/i);
+        if (heartbeatMatch) {
+          heartbeatInterfaces.add(heartbeatMatch[1].toLowerCase());
+          hasCphaprobInterfaceOutput = true;
+          return;
+        }
         if (/^\s*set dynamic-balancing config CLUSTER_MODE value 1\s*$/i.test(line)) { hasClusterMode = true; return; }
         let match = line.match(/^\s*set management interface\s+(\S+)\s*$/i);
         if (match) { managementInterface = match[1]; return; }
@@ -184,7 +194,7 @@
         }
         match = line.match(/^\s*set static-route\s+(\S+)\s+comment\s+"([^"]*)"\s*$/i);
         if (match) { comments.set(match[1].toLowerCase(), match[2]); return; }
-        match = line.match(/^\s*set static-route\s+(\S+)\s+nexthop\s+gateway\s+address\s+(\d+(?:\.\d+){3})\s+(?:on|off)\s*$/i);
+        match = line.match(/^\s*set static-route\s+(\S+)\s+nexthop\s+gateway\s+address\s+(\d+(?:\.\d+){3})(?:\s+priority\s+\d+)?\s+(?:on|off)\s*$/i);
         if (match) routeRows.push({ destination: match[1], nextHop: match[2] });
       });
       const routes = routeRows.map(route => {
@@ -197,7 +207,9 @@
         const clusterIps = interfaceClusterIps.get(name) || [];
         const group = name.match(/^bond(\d+)(?:\.\d+)?$/i)?.[1];
         const comment = interfaceComments.get(name) || "";
-        const heartbeatEvidence = /\b(?:heart[\s-]*beat|hb)\b/i.test(comment) ? "介面註解" : "";
+        const heartbeatEvidence = heartbeatInterfaces.has(name.toLowerCase())
+          ? "cphaprob -a if 的 (S) 標記"
+          : (!hasCphaprobInterfaceOutput && /\b(?:heart[\s-]*beat|hb)\b/i.test(comment) ? "介面註解（備援）" : "");
         return { name, ips, clusterIps, comment, isHeartbeat: Boolean(heartbeatEvidence), heartbeatEvidence, networks: ips.map(cidrNet), members: group ? [...new Set(bondMembers.get(group) || [])] : [] };
       });
       const managementIp = managementInterface ? ifaces.find(iface => iface.name === managementInterface)?.ips[0]?.split("/")[0] || "未定義" : "未定義";
@@ -340,6 +352,52 @@
         topologyDevices.push({ hostname, managementIp: members.map(member => member.managementIp).join(" / "), source: members.map(member => member.source).join(", "), ifaces, routes: [...routeMap.values()].map(route => ({ ...route, name: hostname })), clusterMembers: members.map(member => ({ hostname: member.hostname, managementIp: member.managementIp })) });
       });
       return topologyDevices;
+    }
+
+    function resolveNodeOverlaps(nodes, width, height) {
+      const isFixed = node => node.type === "root" || node.type === "supplement-root" || node.isBondParent;
+      const overlapRatio = (left, right) => {
+        const overlapWidth = Math.max(0, Math.min(left.x + left.w, right.x + right.w) - Math.max(left.x, right.x));
+        const overlapHeight = Math.max(0, Math.min(left.y + left.h, right.y + right.h) - Math.max(left.y, right.y));
+        const overlapArea = overlapWidth * overlapHeight;
+        const smallerArea = Math.min(left.w * left.h, right.w * right.h);
+        return smallerArea ? overlapArea / smallerArea : 0;
+      };
+      const moveNode = (node, dx, dy) => {
+        node.x = Math.max(0, Math.min(width - node.w, node.x + dx));
+        node.y = Math.max(0, Math.min(height - node.h, node.y + dy));
+      };
+      for (let pass = 0; pass < 90; pass += 1) {
+        let changed = false;
+        for (let leftIndex = 0; leftIndex < nodes.length; leftIndex += 1) {
+          for (let rightIndex = leftIndex + 1; rightIndex < nodes.length; rightIndex += 1) {
+            const left = nodes[leftIndex], right = nodes[rightIndex];
+            if (overlapRatio(left, right) <= .2) continue;
+            const overlapWidth = Math.max(0, Math.min(left.x + left.w, right.x + right.w) - Math.max(left.x, right.x));
+            const overlapHeight = Math.max(0, Math.min(left.y + left.h, right.y + right.h) - Math.max(left.y, right.y));
+            const leftCenterX = left.x + left.w / 2, rightCenterX = right.x + right.w / 2;
+            const leftCenterY = left.y + left.h / 2, rightCenterY = right.y + right.h / 2;
+            const horizontal = overlapWidth / Math.max(1, Math.min(left.w, right.w)) <= overlapHeight / Math.max(1, Math.min(left.h, right.h));
+            const direction = horizontal
+              ? (leftCenterX <= rightCenterX ? 1 : -1)
+              : (leftCenterY <= rightCenterY ? 1 : -1);
+            const distance = (horizontal ? overlapWidth : overlapHeight) + 8;
+            const leftFixed = isFixed(left), rightFixed = isFixed(right);
+            if (horizontal) {
+              if (!leftFixed && !rightFixed) { moveNode(left, -direction * distance / 2, 0); moveNode(right, direction * distance / 2, 0); }
+              else if (!leftFixed) moveNode(left, -direction * distance, 0);
+              else if (!rightFixed) moveNode(right, direction * distance, 0);
+              else continue;
+            } else if (!leftFixed && !rightFixed) {
+              moveNode(left, 0, -direction * distance / 2); moveNode(right, 0, direction * distance / 2);
+            } else if (!leftFixed) moveNode(left, 0, -direction * distance);
+            else if (!rightFixed) moveNode(right, 0, direction * distance);
+            else continue;
+            changed = true;
+          }
+        }
+        if (!changed) break;
+      }
     }
 
     function makeTreeGraph() {
@@ -529,17 +587,28 @@
       if (isIpv4(smsIp)) {
         const smsConnections = [];
         deviceLayouts.forEach(({ device, deviceIndex }) => {
+          const directInterface = device.ifaces.find(iface =>
+            (iface.ips || []).some(cidr => ipv4InCidr(smsIp, cidr))
+          );
+          if (directInterface) {
+            const interfaceRef = interfaceRefs.find(ref =>
+              ref.deviceIndex === deviceIndex && ref.iface?.name === directInterface.name
+            );
+            if (interfaceRef) smsConnections.push({ device, route: null, fromRef: interfaceRef });
+            return;
+          }
           const matchingRoute = device.routes
             .filter(route => ipv4InCidr(smsIp, route.destination))
             .sort((left, right) => (parseCidr(right.destination)?.bits || 0) - (parseCidr(left.destination)?.bits || 0))[0];
           if (!matchingRoute?.nextHop) return;
           const nextHopRef = nextHopRefs.find(ref => ref.deviceIndex === deviceIndex && ref.node.label === matchingRoute.nextHop && ref.routes.some(route => route.destination === matchingRoute.destination));
-          if (nextHopRef) smsConnections.push({ device, route: matchingRoute, nextHopRef });
+          if (nextHopRef) smsConnections.push({ device, route: matchingRoute, fromRef: nextHopRef });
         });
         if (smsConnections.length) {
           const smsNode = addNode({ id: `sms:${smsIp}`, type: "sms", x: width - 184, y: Math.max(24, height / 2 - 38), w: 160, h: 76, label: smsIp });
-          smsConnections.forEach(({ device, route, nextHopRef }) => {
-            edges.push({ from: nextHopRef.node.id, to: smsNode.id, type: "sms-route", title: `${device.hostname}：${route.destination} → SMS ${smsIp}` });
+          smsConnections.forEach(({ device, route, fromRef }) => {
+            const pathDescription = route ? `${route.destination} → SMS ${smsIp}` : `直接連線 → SMS ${smsIp}`;
+            edges.push({ from: fromRef.node.id, to: smsNode.id, type: "sms-route", title: `${device.hostname}：${pathDescription}` });
           });
         }
       }
@@ -605,24 +674,20 @@
         });
       });
 
+      resolveNodeOverlaps(nodes, width, height);
+
       const relatedPairs = new Set();
       for (let a = 0; a < nextHopRefs.length; a += 1) {
         for (let b = a + 1; b < nextHopRefs.length; b += 1) {
           const left = nextHopRefs[a], right = nextHopRefs[b];
           if (left.deviceIndex === right.deviceIndex) continue;
-          const leftDestinations = new Set(left.routes.map(route => cidrNet(route.destination)).filter(destination => destination && destination !== "0.0.0.0/0"));
-          const sameDestination = right.routes.map(route => cidrNet(route.destination)).find(destination => leftDestinations.has(destination));
-          let relation = sameDestination ? `相同目的網段 ${sameDestination}` : "";
-          if (!relation) {
-            const leftToRight = left.routes.some(route => routeCoversDevice(route, right.device));
-            const rightToLeft = right.routes.some(route => routeCoversDevice(route, left.device));
-            if (leftToRight && rightToLeft) relation = "對向路由";
-          }
-          if (!relation) continue;
+          const leftToRight = left.routes.some(route => routeCoversDevice(route, right.device));
+          const rightToLeft = right.routes.some(route => routeCoversDevice(route, left.device));
+          if (!leftToRight || !rightToLeft) continue;
           const pairKey = [left.node.id, right.node.id].sort().join("|");
           if (relatedPairs.has(pairKey)) continue;
           relatedPairs.add(pairKey);
-          edges.push({ from: left.node.id, to: right.node.id, type: "route-related", relation: true, title: relation });
+          edges.push({ from: left.node.id, to: right.node.id, type: "route-related", relation: true, title: "雙向路由覆蓋" });
         }
       }
 
@@ -701,7 +766,7 @@
     function updateTreeEdges(svg) {
       const graph = treeUi.graph;
       graph.edges.forEach((edge, index) => {
-        const path = svg.querySelector(`[data-edge="${index}"]`);
+        const path = graph.edgeElements?.get(index) || svg.querySelector(`[data-edge="${index}"]`);
         if (path) path.setAttribute("d", edgePath(graph.nodeMap.get(edge.from), graph.nodeMap.get(edge.to), edge));
       });
     }
@@ -727,6 +792,30 @@
         canvas.scrollLeft = Math.max(0, ratioX * baseWidth * zoom - focusX);
         canvas.scrollTop = Math.max(0, ratioY * baseHeight * zoom - focusY);
       });
+    }
+
+    function fitTreeToCanvas(canvas) {
+      const svg = canvas.querySelector(".tree-svg");
+      const graph = treeUi.graph;
+      if (!svg || !graph?.nodes?.length) return;
+      const baseWidth = Number(svg.dataset.baseWidth);
+      const baseHeight = Number(svg.dataset.baseHeight);
+      if (!baseWidth || !baseHeight || !graph.width || !graph.height) return;
+      const bounds = graph.nodes.reduce((result, node) => ({
+        minX: Math.min(result.minX, node.x),
+        minY: Math.min(result.minY, node.y),
+        maxX: Math.max(result.maxX, node.x + node.w),
+        maxY: Math.max(result.maxY, node.y + node.h)
+      }), { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
+      const padding = 28;
+      const contentWidth = Math.max(1, bounds.maxX - bounds.minX + padding * 2);
+      const contentHeight = Math.max(1, bounds.maxY - bounds.minY + padding * 2);
+      const availableWidth = Math.max(1, canvas.clientWidth - padding * 2);
+      const availableHeight = Math.max(1, canvas.clientHeight - padding * 2);
+      const widthZoom = availableWidth * graph.width / (baseWidth * contentWidth);
+      const heightZoom = availableHeight * graph.height / (baseHeight * contentHeight);
+      const fitZoom = Math.max(.5, Math.min(3, Math.min(widthZoom, heightZoom)));
+      setTreeZoom(canvas, fitZoom, { x: canvas.clientWidth / 2, y: canvas.clientHeight / 2 });
     }
 
     function setTreeSelection(svg, nodeId, options = {}) {
@@ -775,6 +864,14 @@
     function bindTreeDrag(svg) {
       let active = null;
       let suppressClick = false;
+      let edgeUpdateFrame = null;
+      const scheduleEdgeUpdate = () => {
+        if (edgeUpdateFrame !== null) return;
+        edgeUpdateFrame = requestAnimationFrame(() => {
+          edgeUpdateFrame = null;
+          updateTreeEdges(svg);
+        });
+      };
       const descendantsOf = nodeId => {
         const descendants = new Set();
         const pending = [nodeId];
@@ -830,7 +927,7 @@
           treeUi.positions.set(follower.node.id, { x: follower.node.x, y: follower.node.y });
           follower.element?.setAttribute("transform", `translate(${follower.node.x},${follower.node.y})`);
         });
-        updateTreeEdges(svg);
+        scheduleEdgeUpdate();
       });
       const finish = event => {
         if (!active) return;
@@ -1256,6 +1353,7 @@
       const svgStyle = `width:${baseWidth * treeUi.zoom}px;height:${baseHeight * treeUi.zoom}px`;
       canvas.innerHTML = `<svg class="tree-svg" data-base-width="${baseWidth}" data-base-height="${baseHeight}" viewBox="0 0 ${graph.width} ${graph.height}" preserveAspectRatio="xMidYMid meet" style="${svgStyle}" role="img" aria-label="每台設備各自形成圓狀拓樸，ROOT 位於群組中心，Interface 與依路由分類的 Next Hop IP 環繞展開，並標示跨設備關聯"><defs><filter id="treeShadow"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#172033" flood-opacity=".12"/></filter><marker id="gatewayArrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#7c3aed"/></marker></defs><g aria-hidden="true">${ringGuides}</g>${edges}${nodes}</svg>`;
       const treeSvg = canvas.querySelector("svg");
+      graph.edgeElements = new Map([...treeSvg.querySelectorAll("[data-edge]")].map(path => [Number(path.dataset.edge), path]));
       treeSvg.classList.toggle("hide-related-routes", !treeUi.showRelatedRoutes);
       treeSvg.classList.toggle("hide-gateway-links", !treeUi.showGatewayLinks);
       bindTreeDrag(treeSvg);
@@ -1282,7 +1380,7 @@
       bindCanvasPan(canvas);
       $("#zoomOut").onclick = () => setTreeZoom(canvas, treeUi.zoom - .15);
       $("#zoomIn").onclick = () => setTreeZoom(canvas, treeUi.zoom + .15);
-      $("#zoomFit").onclick = () => setTreeZoom(canvas, 1);
+      $("#zoomFit").onclick = () => fitTreeToCanvas(canvas);
       canvas.onwheel = event => {
         event.preventDefault();
         const rect = canvas.getBoundingClientRect();
