@@ -27,7 +27,7 @@
 </head>
 <body>
   <main class="shell">
-    <div class="top"><div><div class="eyebrow-row"><div class="eyebrow">Check Point</div><time class="edited-at" datetime="2026-07-19T19:52:00+08:00">最後編輯時間：2026-07-19 19:52</time></div><h1>Check Point 網路拓樸工具</h1><p>載入最多七份設定檔，快速還原介面與靜態路由關係。</p></div><div class="privacy">⌁ 全程在瀏覽器本機解析，不上傳設定檔</div></div>
+    <div class="top"><div><div class="eyebrow-row"><div class="eyebrow">Check Point</div><time class="edited-at">最後編輯時間：讀取中</time></div><h1>Check Point 網路拓樸工具</h1><p>載入最多七份設定檔，快速還原介面與靜態路由關係。</p></div><div class="privacy">⌁ 全程在瀏覽器本機解析，不上傳設定檔</div></div>
     <aside class="panel control control-top">
         <div class="control-intro"><h2>匯入補充設備描述 (非必需)</h2><label class="supplement-upload"><span>補充說明 TXT（IP／主機／備註）</span><span class="btn-file">選取 TXT</span><input id="supplementFile" type="file" accept=".txt,text/plain" /><span class="file-name" id="supplementFileName">尚未選取</span></label></div>
         <label class="drop" id="drop"><strong>拖曳設定檔到這裡</strong><span>請上傳 "show configuration" 與 "cphaprob -a if" 的 .log 或 .txt 檔案</span><input id="files" type="file" accept=".log,.txt,text/plain" multiple /></label>
@@ -73,6 +73,12 @@
   <script>
     const $=s=>document.querySelector(s), state={files:[], data:[], model:null, supplements:new Map(), supplementFileName:"", supplementErrors:[], smsIp:"", renderVersion:0};
     $(".eyebrow").textContent = "Check Point 網路拓樸工具";
+    const editedAt = $(".edited-at"), lastEdited = new Date(document.lastModified);
+    if (editedAt && !Number.isNaN(lastEdited.getTime())) {
+      const text = new Intl.DateTimeFormat("zh-TW", { year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", hour12:false }).format(lastEdited).replaceAll("/", "-");
+      editedAt.dateTime = lastEdited.toISOString();
+      editedAt.textContent = `最後編輯時間：${text}`;
+    }
     document.querySelector(".legend span:nth-of-type(6)").insertAdjacentHTML("afterend", '<span>相關路由定義：僅在跨設備的路由彼此涵蓋對方設備 IP 時顯示；此為邏輯關聯，非實體連線。</span>');
     document.querySelector(".legend").insertAdjacentHTML("beforeend", '<span><i style="background:#9a3412"></i>TXT 補充主機名稱</span>');
     document.querySelector(".legend").insertAdjacentHTML("beforeend", '<span><i style="width:18px;height:0;border-top:2px solid #64748b;border-radius:0"></i>相同補充主機</span>');
@@ -148,14 +154,40 @@
       const heartbeatInterfaces = new Set();
       let hasClusterMode = false;
       let managementInterface = "";
-      let hasCphaprobInterfaceOutput = false;
+      let inVirtualClusterInterfaces = false;
+      let inCphaprobInterfaceList = false;
+      const addClusterIp = (iface, ip, bits) => {
+        if (!isValidIpv4(ip) || (bits !== undefined && (Number(bits) < 0 || Number(bits) > 32))) return;
+        const entries = interfaceClusterIps.get(iface) || [];
+        const value = { ip, bits: bits === undefined ? null : Number(bits) };
+        if (!entries.some(entry => entry.ip === value.ip && entry.bits === value.bits)) entries.push(value);
+        interfaceClusterIps.set(iface, entries);
+      };
       lines.forEach(line => {
-        if (/\bcphaprob\s+-a\s+if\b/i.test(line) || /^\s*Interface Name\b/i.test(line)) hasCphaprobInterfaceOutput = true;
-        let heartbeatMatch = line.match(/^\s*Interface Name\s*:?\s*([A-Za-z][\w.-]*)\b.*\(\s*S\s*\)\s*$/i);
-        if (!heartbeatMatch && !/^\s*Interface Name\b/i.test(line)) heartbeatMatch = line.match(/^\s*([A-Za-z][\w.-]*)\b.*\(\s*S\s*\)\s*$/i);
+        if (/^\s*Virtual\s+cluster\s+interfaces\s*:\s*(?:\d+)?\s*$/i.test(line)) {
+          inVirtualClusterInterfaces = true;
+          inCphaprobInterfaceList = false;
+          return;
+        }
+        if (inVirtualClusterInterfaces) {
+          const virtualInterface = line.match(/^\s*([A-Za-z][\w.-]*)\s*:?[\t ]+(\d+(?:\.\d+){3})(?:\/(\d{1,2}))?\b/);
+          if (virtualInterface && !/^interface$/i.test(virtualInterface[1])) {
+            addClusterIp(virtualInterface[1], virtualInterface[2], virtualInterface[3]);
+            return;
+          }
+          if (/^\s*(?:set|add|delete|cphaprob)\b/i.test(line) || /^\s*\S+>\s*$/i.test(line) || /^\s*[A-Z][A-Za-z ]+:\s*$/i.test(line)) inVirtualClusterInterfaces = false;
+        }
+        const interfaceHeader = line.match(/^\s*Interface Name\s*:\s*(.*)$/i);
+        if (interfaceHeader) {
+          inCphaprobInterfaceList = true;
+          const inlineHeartbeat = interfaceHeader[1].match(/^([A-Za-z][\w.-]*)\s*\(\s*S\s*\)(?:\s+.*)?$/i);
+          if (inlineHeartbeat) heartbeatInterfaces.add(inlineHeartbeat[1].toLowerCase());
+          return;
+        }
+        if (/^\s*S\s*-\s*sync\b/i.test(line)) inCphaprobInterfaceList = false;
+        const heartbeatMatch = inCphaprobInterfaceList ? line.match(/^\s*([A-Za-z][\w.-]*)\s*\(\s*S\s*\)(?:\s+.*)?$/i) : null;
         if (heartbeatMatch) {
           heartbeatInterfaces.add(heartbeatMatch[1].toLowerCase());
-          hasCphaprobInterfaceOutput = true;
           return;
         }
         if (/^\s*set dynamic-balancing config CLUSTER_MODE value 1\s*$/i.test(line)) { hasClusterMode = true; return; }
@@ -183,13 +215,8 @@
         }
         match = line.match(/^\s*set interface\s+(\S+)\s+(?:ipv4-)?(?:virtual-ip|vip)\s+(\d+(?:\.\d+){3})(?:\s+mask-length\s+(\d{1,2}))?\s*$/i);
         if (match) {
-          const [, iface, ip, bits = "32"] = match;
-          if (isValidIpv4(ip) && Number(bits) <= 32) {
-            const entries = interfaceClusterIps.get(iface) || [];
-            const cidr = `${ip}/${bits}`;
-            if (!entries.includes(cidr)) entries.push(cidr);
-            interfaceClusterIps.set(iface, entries);
-          }
+          const [, iface, ip, bits] = match;
+          addClusterIp(iface, ip, bits);
           return;
         }
         match = line.match(/^\s*set static-route\s+(\S+)\s+comment\s+"([^"]*)"\s*$/i);
@@ -204,12 +231,13 @@
       const interfaceNames = new Set([...interfaceAddresses.keys(), ...interfaceClusterIps.keys(), ...interfaceComments.keys()]);
       const ifaces = [...interfaceNames].filter(iface => !/^lo$/i.test(iface)).map(name => {
         const ips = interfaceAddresses.get(name) || [];
-        const clusterIps = interfaceClusterIps.get(name) || [];
+        const clusterIps = (interfaceClusterIps.get(name) || []).map(clusterIp => {
+          const maskLength = clusterIp.bits ?? ips.map(parseCidr).find(ip => ip && ipv4InCidr(clusterIp.ip, `${ip.ip}/${ip.bits}`))?.bits ?? 32;
+          return `${clusterIp.ip}/${maskLength}`;
+        });
         const group = name.match(/^bond(\d+)(?:\.\d+)?$/i)?.[1];
         const comment = interfaceComments.get(name) || "";
-        const heartbeatEvidence = heartbeatInterfaces.has(name.toLowerCase())
-          ? "cphaprob -a if 的 (S) 標記"
-          : (!hasCphaprobInterfaceOutput && /\b(?:heart[\s-]*beat|hb)\b/i.test(comment) ? "介面註解（備援）" : "");
+        const heartbeatEvidence = heartbeatInterfaces.has(name.toLowerCase()) ? "cphaprob -a if 的 (S) 標記" : "";
         return { name, ips, clusterIps, comment, isHeartbeat: Boolean(heartbeatEvidence), heartbeatEvidence, networks: ips.map(cidrNet), members: group ? [...new Set(bondMembers.get(group) || [])] : [] };
       });
       const managementIp = managementInterface ? ifaces.find(iface => iface.name === managementInterface)?.ips[0]?.split("/")[0] || "未定義" : "未定義";
@@ -333,13 +361,7 @@
         }));
         const ifaces = [...ifaceMap.values()].map(iface => {
           const comment = iface.comments.join(" / ");
-          const isClusterInterface = iface.ips.length >= 2 && !iface.isHeartbeat;
-          const parsedIps = iface.ips.map(parseCidr).filter(Boolean);
-          if (isClusterInterface && parsedIps.length >= 2 && parsedIps.every(item => item.bits === parsedIps[0].bits && cidrNet(`${item.ip}/${item.bits}`) === cidrNet(`${parsedIps[0].ip}/${parsedIps[0].bits}`)) && Math.abs(ipNum(parsedIps[0].ip) - ipNum(parsedIps[1].ip)) === 1) {
-            const clusterValue = Math.min(ipNum(parsedIps[0].ip), ipNum(parsedIps[1].ip)) - 1;
-            const inferredClusterIp = `${[clusterValue >>> 24, clusterValue >>> 16 & 255, clusterValue >>> 8 & 255, clusterValue & 255].join(".")}/${parsedIps[0].bits}`;
-            if (!iface.clusterIps.includes(inferredClusterIp)) iface.clusterIps.push(inferredClusterIp);
-          }
+          const isClusterInterface = iface.clusterIps.length > 0 && !iface.isHeartbeat;
           return { ...iface, comment, isClusterInterface, networks: iface.ips.map(cidrNet) };
         });
         const routeMap = new Map();
@@ -561,6 +583,7 @@
               interfaceNode.displayLabel = `Bond${bondNumber}.${vlanTag}`;
               interfaceNode.isVlan = true;
             }
+            if (interfaceNode.isHeartbeat) interfaceNode.displayLabel += " (Heartbeat)";
             interfaceRefs.push({ node: interfaceNode, iface: branch.iface, device, deviceIndex });
             const edgeOrigin = bondParentNode || root;
             edges.push({ from: edgeOrigin.id, to: interfaceNode.id, type: "root", title: `${edgeOrigin.label} → ${interfaceNode.label}` });
@@ -736,10 +759,10 @@
         return `<g class="drag-node" data-node="${esc(node.id)}" transform="translate(${node.x},${node.y})"><circle cx="64" cy="64" r="60" fill="#ffffff" stroke="#2563eb" stroke-width="2" filter="url(#treeShadow)"/><circle cx="64" cy="64" r="53" fill="#eff5ff" stroke="#bdd3f7"/><text x="64" y="34" text-anchor="middle" font-size="9" font-weight="700" fill="#2563eb">ROOT</text><text x="64" y="62" text-anchor="middle" font-size="7.92" fill="#172033">主機名稱：<tspan font-weight="800">${esc(node.label).slice(0, 12)}</tspan></text><text x="64" y="86" text-anchor="middle" font-size="7.92" fill="#1d4ed8" text-decoration="underline">設備 IP：<tspan font-weight="800">${esc(deviceIp).slice(0, 14)}</tspan></text></g>`;
       }
       if (node.type === "interface") {
-        const nodeFill = node.isVlan ? "#fce7f3" : (node.isClusterInterface ? "#b7e4cf" : "#edf9f5");
-        const nodeStroke = node.isVlan ? "#9d174d" : (node.isClusterInterface ? "#087f5b" : "#31a47f");
-        const labelColor = node.isVlan ? "#9d174d" : (node.isClusterInterface ? "#064e3b" : "#173f34");
-        const detailColor = node.isVlan ? "#9d174d" : "#167159";
+        const nodeFill = node.isHeartbeat ? "#dbeafe" : (node.isVlan ? "#fce7f3" : (node.isClusterInterface ? "#b7e4cf" : "#edf9f5"));
+        const nodeStroke = node.isHeartbeat ? "#60a5fa" : (node.isVlan ? "#9d174d" : (node.isClusterInterface ? "#087f5b" : "#31a47f"));
+        const labelColor = node.isHeartbeat ? "#1d4ed8" : (node.isVlan ? "#9d174d" : (node.isClusterInterface ? "#064e3b" : "#173f34"));
+        const detailColor = node.isHeartbeat ? "#2563eb" : (node.isVlan ? "#9d174d" : "#167159");
         const detailFontSize = 9.18;
         if (node.isBondParent) {
           const [, bondName = node.label, memberText = ""] = String(node.displayLabel || "").match(/^([^\s]+)\s*(.*)$/) || [];
@@ -751,7 +774,7 @@
         const standaloneOwnerRows = node.isClusterInterface ? "" : (node.ipOwners?.length ? node.ipOwners.slice(0, 2).map((owner, index) => `<text x="6" y="${33 + index * 14}" font-size="${detailFontSize}" fill="${detailColor}">${esc(owner.hostname)}：<tspan font-weight="800">${esc(owner.ip)}</tspan>${owner.comment ? `（${esc(owner.comment).slice(0, 14)}）` : ""}</text>`).join("") : `<text x="6" y="33" font-size="${detailFontSize}" fill="${detailColor}">IP：<tspan font-weight="800">${esc(primaryIp)}</tspan></text>`);
         const commentY = node.isClusterInterface ? 61 : 33 + Math.max(1, Math.min(2, node.ipOwners?.length || 1)) * 14;
         const commentLine = node.comment && (node.isClusterInterface || !node.ipOwners?.length) ? `<text x="6" y="${commentY}" font-size="6.12" fill="#0f766e">註解：${esc(node.comment).slice(0, 22)}</text>` : "";
-        return `<g class="drag-node" data-node="${esc(node.id)}" transform="translate(${node.x},${node.y})"><title>${esc([node.displayLabel || node.label, ...((node.ipOwners?.length ? node.ipOwners.map(owner => `${owner.hostname}: ${owner.ip}`) : node.ips || []).map(String)), node.clusterIps?.length ? `Cluster IP: ${node.clusterIps.join(", ")}` : "", node.heartbeatEvidence ? `Heartbeat：依${node.heartbeatEvidence}判定` : "", node.comment].filter(Boolean).join("\n"))}</title><rect width="${node.w}" height="${node.h}" rx="7" fill="${nodeFill}" stroke="${nodeStroke}" stroke-width="${node.isClusterInterface ? "1.6" : ".8"}" filter="url(#treeShadow)"/><text x="6" y="18" font-size="10.7" font-weight="800" fill="${labelColor}">${esc(node.displayLabel || node.label)}</text>${clusterIpLine}${ownerRows}${standaloneOwnerRows}${commentLine}</g>`;
+        return `<g class="drag-node" data-node="${esc(node.id)}" transform="translate(${node.x},${node.y})"><title>${esc([node.displayLabel || node.label, ...((node.ipOwners?.length ? node.ipOwners.map(owner => `${owner.hostname}: ${owner.ip}`) : node.ips || []).map(String)), node.clusterIps?.length ? `Cluster IP: ${node.clusterIps.join(", ")}` : "", node.heartbeatEvidence ? `Heartbeat：依${node.heartbeatEvidence}判定` : "", node.comment].filter(Boolean).join("\n"))}</title><rect width="${node.w}" height="${node.h}" rx="7" fill="${nodeFill}" stroke="${nodeStroke}" stroke-width="${node.isClusterInterface || node.isHeartbeat ? "1.6" : ".8"}" filter="url(#treeShadow)"/><text x="6" y="18" font-size="10.7" font-weight="800" fill="${labelColor}">${esc(node.displayLabel || node.label)}</text>${clusterIpLine}${ownerRows}${standaloneOwnerRows}${commentLine}</g>`;
       }
       if (node.type === "next-hop") {
         const routeSummary = node.routes[0]?.destination || "無目的網段";
