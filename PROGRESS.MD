@@ -7,7 +7,9 @@
 - 管理 IP 改依 `set management interface <介面>` 指向的介面 IPv4 取得；查無設定、介面或 IPv4 時統一顯示「未定義」。
 - Static Route 解析支援 `nexthop gateway address <IP> priority <數值> on/off` 格式，包含帶 priority 的 `default` 預設路由，並正規化為 `0.0.0.0/0`。
 - SMS 路由新增直接連線優先判斷：SMS IP 落在 ROOT 介面網段時，直接由介面連至 SMS；非直連才走最長前綴 Static Route／Next Hop。
-- Heartbeat 改以 `cphaprob -a if` 介面行的 `(S)` 標記優先判定；未提供該輸出時才使用介面註解作備援，並在節點提示標明判定來源。
+- Heartbeat 規則再收緊為只有 `cphaprob -a if` 的 `(S)` 標記才算 HB；`Beat` 等介面註解僅保留為備註，不再觸發 HB 判定。
+- 移除依成員 IP 相鄰位置減一推測 Cluster IP 的邏輯；沒有明確 VIP／virtual IP 時不顯示 Cluster IP，也不將該介面標記為 Cluster 介面。
+- Cluster IP 改解析 `cphaprob -a if` 的 `Virtual cluster interfaces`；未含遮罩的 IP 會依同介面的 IPv4 網段補上 CIDR，無可用網段時才使用 `/32`。
 - 跨設備相關路由改為必須「雙方路由皆涵蓋對方設備 IP」才顯示；移除僅因目的網段相同而產生的關聯線。
 
 ### 互動、效能與介面

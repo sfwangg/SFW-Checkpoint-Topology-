@@ -21,7 +21,7 @@
 - SMS IP 若位於 ROOT 的直接連線介面網段，必須直接由該介面連到 SMS；只有非直連時才使用 Static Route 與 Next Hop。
 - 補充 TXT 為 IP／主機名稱／備註三欄；相同主機名稱應合併為補充 ROOT。
 - 管理 IP 必須由 `set management interface <介面>` 指向的介面 IPv4 取得；查無設定、介面或 IPv4 時顯示「未定義」，不可改用檔名或 `Mgmt` 介面猜測。
-- Heartbeat 必須以 `cphaprob -a if` 介面行的 `(S)` 標記優先判定；僅在未提供該輸出時，介面註解才可作備援。
+- Heartbeat 必須且只能以 `cphaprob -a if` 介面行的 `(S)` 標記判定；`Beat`、`Heartbeat` 等介面註解不可自行推導 HB。
 
 ## 視覺與互動慣例
 
@@ -37,6 +37,7 @@
 - IPv4 與 CIDR 必須使用嚴格驗證。
 - 路由先比對直接連線，再使用最長前綴 Static Route。
 - HA Cluster 不可只依主機名稱或單一 IP 推測，需有明確 Cluster mode、同 /24 且管理 IP 相鄰。
+- Cluster IP 以 `cphaprob -a if` 的 `Virtual cluster interfaces` 列出的介面與 IP 為主要來源；相容設定檔明確 VIP／virtual IP。不得以成員 IP 相鄰或減一規則推測。
 - VLAN 父 Bond 的位置要由全部 VLAN 的幾何分布計算，不得取第一個 VLAN 作為唯一依據。
 - 路由註解若存在必須在介面／Next Hop 或路由表適當位置顯示。
 - `cphaprob -a if` 若和 `show configuration` 分成不同檔案，未建立可靠設備配對前不可任意合併 Heartbeat 資訊。

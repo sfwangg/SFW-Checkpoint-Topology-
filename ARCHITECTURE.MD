@@ -44,10 +44,10 @@ show configuration／cphaprob -a if ─┐
 
 - 主機名稱、`set management interface <介面>` 與該介面的管理 IP；找不到時管理 IP 為「未定義」。
 - `set interface` 的介面 IP／CIDR與介面註解。
-- `cphaprob -a if` 中介面行的 `(S)` 標記；此標記優先作為 Heartbeat 判定，缺少該輸出時才以註解備援。
+- `cphaprob -a if` 中介面行的 `(S)` 標記；只有此標記能判定 Heartbeat，介面註解不作 Heartbeat 推導。
 - Bond 介面及其成員；顯示格式為 `Bond1 (eth1-05 + eth5)`。
 - `bondX.<tag>` VLAN 子介面；拓樸節點顯示為 `BondX.<tag>`。
-- VIP／virtual IP／Cluster IP。
+- `cphaprob -a if` 的 `Virtual cluster interfaces` 內介面與 IP，作為 Cluster IP 的主要來源；若同一介面已有 IPv4／CIDR，沿用其遮罩。另相容解析設定檔明確的 VIP／virtual IP。
 - `set static-route` 的目的網段、Next Hop、介面及註解。
 - `CLUSTER_MODE`，供 HA Cluster 判斷使用。
 
@@ -81,6 +81,8 @@ show configuration／cphaprob -a if ─┐
 ## 路由與 SMS
 
 路由判斷先檢查直接連線網段，再以最長前綴選擇 Static Route。輸入 SMS IP 並按下「確定」後，若 SMS 位於 ROOT 的直接連線介面，介面直接連至 SMS；否則由對應 Next Hop 連至 SMS。
+
+Cluster IP 取自 `cphaprob -a if` 的 `Virtual cluster interfaces`（或設定檔明確的 VIP／virtual IP），不得根據兩台成員 IP 的相鄰關係推測。沒有明確 Cluster IP 時，該介面不標示為 Cluster 介面。
 
 ## 安全與限制
 
